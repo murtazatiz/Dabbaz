@@ -42,7 +42,10 @@ export const createMenuItem = async (req: Request, res: Response) => {
         const vendorProfile = await prisma.vendorProfile.findUnique({ where: { user_id: user.id } });
         if (!vendorProfile) return res.status(404).json({ message: 'Vendor not found' });
 
-        const { date, meal_type, name, description, food_type } = req.body;
+        const {
+            date, meal_type, name, description, food_type,
+            fulfilment_types, max_orders, max_portions
+        } = req.body;
 
         const item = await prisma.menuItem.create({
             data: {
@@ -52,6 +55,9 @@ export const createMenuItem = async (req: Request, res: Response) => {
                 name,
                 description,
                 food_type,
+                fulfilment_types: fulfilment_types || 'DELIVERY',
+                max_orders: max_orders ? Number(max_orders) : null,
+                max_portions: max_portions ? Number(max_portions) : null,
             },
         });
 
@@ -65,11 +71,21 @@ export const createMenuItem = async (req: Request, res: Response) => {
 export const updateMenuItem = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const { name, description, food_type } = req.body;
+        const {
+            name, description, food_type,
+            fulfilment_types, max_orders, max_portions
+        } = req.body;
 
         const item = await prisma.menuItem.update({
             where: { id: Number(id) },
-            data: { name, description, food_type },
+            data: {
+                name,
+                description,
+                food_type,
+                fulfilment_types,
+                max_orders: max_orders !== undefined ? (max_orders ? Number(max_orders) : null) : undefined,
+                max_portions: max_portions !== undefined ? (max_portions ? Number(max_portions) : null) : undefined,
+            },
         });
 
         res.json({ item });

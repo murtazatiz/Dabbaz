@@ -12,12 +12,22 @@ export default function VendorSettingsPage() {
     const [isActive, setIsActive] = useState(true);
 
     // Delivery settings
+    const [deliveryCharge, setDeliveryCharge] = useState<number | ''>('');
     const [pincodeInput, setPincodeInput] = useState('');
     const [deliveryPincodes, setDeliveryPincodes] = useState<string[]>([]);
     const [lunchStart, setLunchStart] = useState('');
     const [lunchEnd, setLunchEnd] = useState('');
     const [dinnerStart, setDinnerStart] = useState('');
     const [dinnerEnd, setDinnerEnd] = useState('');
+
+    // Collection Settings
+    const [collectionEnabled, setCollectionEnabled] = useState(false);
+    const [collectionAddressLunch, setCollectionAddressLunch] = useState('');
+    const [collectionAddressDinner, setCollectionAddressDinner] = useState('');
+    const [collectionLunchStart, setCollectionLunchStart] = useState('');
+    const [collectionLunchEnd, setCollectionLunchEnd] = useState('');
+    const [collectionDinnerStart, setCollectionDinnerStart] = useState('');
+    const [collectionDinnerEnd, setCollectionDinnerEnd] = useState('');
 
     // Bank details
     const [bankName, setBankName] = useState('');
@@ -38,10 +48,19 @@ export default function VendorSettingsPage() {
                 setIsActive(data.is_active);
 
                 setDeliveryPincodes(JSON.parse(data.delivery_pincodes || '[]'));
+                setDeliveryCharge(data.delivery_charge || '');
                 setLunchStart(data.lunch_window_start || '');
                 setLunchEnd(data.lunch_window_end || '');
                 setDinnerStart(data.dinner_window_start || '');
                 setDinnerEnd(data.dinner_window_end || '');
+
+                setCollectionEnabled(data.collection_enabled || false);
+                setCollectionAddressLunch(data.collection_address_lunch || '');
+                setCollectionAddressDinner(data.collection_address_dinner || '');
+                setCollectionLunchStart(data.collection_lunch_window_start || '');
+                setCollectionLunchEnd(data.collection_lunch_window_end || '');
+                setCollectionDinnerStart(data.collection_dinner_window_start || '');
+                setCollectionDinnerEnd(data.collection_dinner_window_end || '');
 
                 setBankName(data.bank_account_name);
                 setAccNumber(data.bank_account_number);
@@ -75,10 +94,18 @@ export default function VendorSettingsPage() {
                 daily_capacity: Number(dailyCapacity),
                 is_active: isActive,
                 delivery_pincodes: JSON.stringify(deliveryPincodes),
+                delivery_charge: deliveryCharge === '' ? null : Number(deliveryCharge),
                 lunch_window_start: lunchStart,
                 lunch_window_end: lunchEnd,
                 dinner_window_start: dinnerStart,
                 dinner_window_end: dinnerEnd,
+                collection_enabled: collectionEnabled,
+                collection_address_lunch: collectionAddressLunch,
+                collection_address_dinner: collectionAddressDinner,
+                collection_lunch_window_start: collectionLunchStart,
+                collection_lunch_window_end: collectionLunchEnd,
+                collection_dinner_window_start: collectionDinnerStart,
+                collection_dinner_window_end: collectionDinnerEnd,
                 bank_account_name: bankName,
                 bank_account_number: accNumber,
                 bank_ifsc: ifsc
@@ -143,6 +170,17 @@ export default function VendorSettingsPage() {
                             />
                         </div>
 
+                        <div>
+                            <label className="block text-sm mb-1">Delivery Charge (₹ per trip)</label>
+                            <input
+                                type="number"
+                                value={deliveryCharge}
+                                onChange={e => setDeliveryCharge(e.target.value === '' ? '' : Number(e.target.value))}
+                                className="w-1/3 border rounded p-2"
+                                placeholder="Leave empty for free delivery"
+                            />
+                        </div>
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium mb-1">Lunch Delivery Window</label>
@@ -161,6 +199,57 @@ export default function VendorSettingsPage() {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </section>
+
+                {/* Collection Settings */}
+                <section>
+                    <h2 className="text-lg font-medium border-b pb-2 mb-4">Self-Pickup (Collection)</h2>
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 mb-4">
+                            <input
+                                type="checkbox"
+                                id="collectionToggle"
+                                checked={collectionEnabled}
+                                onChange={e => setCollectionEnabled(e.target.checked)}
+                                className="w-4 h-4 text-green-600"
+                            />
+                            <label htmlFor="collectionToggle" className="font-medium">Enable Self-Pickup for Customers</label>
+                        </div>
+
+                        {collectionEnabled && (
+                            <>
+                                <div className="grid md:grid-cols-2 gap-4 border-t pt-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Lunch Pickup Address</label>
+                                        <textarea value={collectionAddressLunch} onChange={e => setCollectionAddressLunch(e.target.value)} className="w-full border rounded p-2 h-16" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Lunch Pickup Window</label>
+                                        <div className="flex gap-2">
+                                            <input type="time" value={collectionLunchStart} onChange={e => setCollectionLunchStart(e.target.value)} className="w-full border rounded p-2" />
+                                            <span className="self-center">to</span>
+                                            <input type="time" value={collectionLunchEnd} onChange={e => setCollectionLunchEnd(e.target.value)} className="w-full border rounded p-2" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Dinner Pickup Address</label>
+                                        <textarea value={collectionAddressDinner} onChange={e => setCollectionAddressDinner(e.target.value)} className="w-full border rounded p-2 h-16" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Dinner Pickup Window</label>
+                                        <div className="flex gap-2">
+                                            <input type="time" value={collectionDinnerStart} onChange={e => setCollectionDinnerStart(e.target.value)} className="w-full border rounded p-2" />
+                                            <span className="self-center">to</span>
+                                            <input type="time" value={collectionDinnerEnd} onChange={e => setCollectionDinnerEnd(e.target.value)} className="w-full border rounded p-2" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </section>
 

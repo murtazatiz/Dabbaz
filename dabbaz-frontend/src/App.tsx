@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider, useAuth } from './store/auth.store';
+import { CartProvider } from './store/cart.store';
 import Layout from './components/Layout';
 
 // Public
@@ -90,7 +91,9 @@ const router = createBrowserRouter([
 function App() {
     return (
         <AuthProvider>
-            <RouterProvider router={router} />
+            <CartProvider>
+                <RouterProvider router={router} />
+            </CartProvider>
         </AuthProvider>
     );
 }

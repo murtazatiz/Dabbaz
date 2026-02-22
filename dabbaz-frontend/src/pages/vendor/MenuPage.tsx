@@ -11,6 +11,9 @@ interface MenuItem {
     food_type: string;
     is_off_day: boolean;
     is_slot_disabled: boolean;
+    fulfilment_types?: string;
+    max_orders?: number | null;
+    max_portions?: number | null;
 }
 
 export default function MenuPage() {
@@ -25,6 +28,9 @@ export default function MenuPage() {
     const [mealName, setMealName] = useState('');
     const [description, setDescription] = useState('');
     const [foodType, setFoodType] = useState('VEG');
+    const [fulfilmentTypes, setFulfilmentTypes] = useState('DELIVERY');
+    const [maxOrders, setMaxOrders] = useState<number | ''>('');
+    const [maxPortions, setMaxPortions] = useState<number | ''>('');
 
     const startDate = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday Start
 
@@ -54,30 +60,39 @@ export default function MenuPage() {
             setMealName(item.name);
             setDescription(item.description || '');
             setFoodType(item.food_type);
+            setFulfilmentTypes(item.fulfilment_types || 'DELIVERY');
+            setMaxOrders(item.max_orders ?? '');
+            setMaxPortions(item.max_portions ?? '');
         } else {
             setEditingId(null);
             setMealName('');
             setDescription('');
             setFoodType('VEG');
+            setFulfilmentTypes('DELIVERY');
+            setMaxOrders('');
+            setMaxPortions('');
         }
         setShowModal(true);
     };
 
     const handleSaveMeal = async () => {
         try {
+            const payload: any = {
+                name: mealName,
+                description,
+                food_type: foodType,
+                fulfilment_types: fulfilmentTypes,
+                max_orders: maxOrders === '' ? null : Number(maxOrders),
+                max_portions: maxPortions === '' ? null : Number(maxPortions)
+            };
+
             if (editingId) {
-                await api.patch(`/vendors/menu/${editingId}`, {
-                    name: mealName,
-                    description,
-                    food_type: foodType,
-                });
+                await api.patch(`/vendors/menu/${editingId}`, payload);
             } else {
                 await api.post(`/vendors/menu`, {
                     date: format(selectedDate!, 'yyyy-MM-dd'),
                     meal_type: activeTab,
-                    name: mealName,
-                    description,
-                    food_type: foodType,
+                    ...payload
                 });
             }
             setShowModal(false);
@@ -204,9 +219,31 @@ export default function MenuPage() {
 
                             <div>
                                 <label className="block text-sm font-medium">Food Type</label>
-                                <div className="flex gap-4 mt-2">
+                                <div className="flex gap-4 mt-2 mb-4">
                                     <label className="flex items-center gap-1"><input type="radio" checked={foodType === 'VEG'} onChange={() => setFoodType('VEG')} /> Veg</label>
                                     <label className="flex items-center gap-1"><input type="radio" checked={foodType === 'NONVEG'} onChange={() => setFoodType('NONVEG')} /> Non-Veg</label>
+                                </div>
+                            </div>
+
+                            {/* Fulfillment Types */}
+                            <div>
+                                <label className="block text-sm font-medium">Fulfillment Type</label>
+                                <select value={fulfilmentTypes} onChange={e => setFulfilmentTypes(e.target.value)} className="w-full border rounded p-2 mt-1 mb-4">
+                                    <option value="DELIVERY">Delivery Only</option>
+                                    <option value="COLLECTION">Collection Only</option>
+                                    <option value="BOTH">Delivery & Collection</option>
+                                </select>
+                            </div>
+
+                            {/* Capacity Limits */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium">Max Orders</label>
+                                    <input type="number" min="1" value={maxOrders} onChange={e => setMaxOrders(e.target.value === '' ? '' : Number(e.target.value))} className="w-full border rounded p-2 mt-1" placeholder="Unlimited" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium">Max Portions</label>
+                                    <input type="number" min="1" value={maxPortions} onChange={e => setMaxPortions(e.target.value === '' ? '' : Number(e.target.value))} className="w-full border rounded p-2 mt-1" placeholder="Unlimited" />
                                 </div>
                             </div>
 

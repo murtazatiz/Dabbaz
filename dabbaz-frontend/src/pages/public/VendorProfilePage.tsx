@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { format, startOfWeek, addDays } from 'date-fns';
 import api from '../../lib/api';
+import { useCart } from '../../store/cart.store';
 
 export default function VendorProfilePage() {
     const { slug } = useParams();
@@ -13,6 +14,8 @@ export default function VendorProfilePage() {
     // Default to showing this week's menu
     const [currentWeek] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
     const [activeMenuTab, setActiveMenuTab] = useState<'LUNCH' | 'DINNER'>('LUNCH');
+    const { addToCart } = useCart();
+    const [addingItem, setAddingItem] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchVendorDetails = async () => {
@@ -41,6 +44,24 @@ export default function VendorProfilePage() {
     if (!vendor) return <div className="p-12 text-center text-red-500">Chef not found</div>;
 
     const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(currentWeek, i));
+
+    const handleAddToCart = async (item: any, dateStr: string) => {
+        setAddingItem(item.id);
+        try {
+            await addToCart({
+                vendor_id: vendor.id,
+                menu_item_id: item.id,
+                meal_type: item.meal_type,
+                delivery_date: dateStr,
+                quantity: 1,
+                fulfillment_mode: 'DELIVERY' // default, user can change in cart
+            });
+        } catch (error: any) {
+            alert(error.response?.data?.message || 'Failed to add to cart');
+        } finally {
+            setAddingItem(null);
+        }
+    };
 
     return (
         <div className="bg-gray-50 min-h-screen pb-12">
@@ -117,13 +138,34 @@ export default function VendorProfilePage() {
                                                 item.is_off_day ? (
                                                     <div className="h-full flex items-center text-gray-400 italic font-medium">Chef is taking a day off.</div>
                                                 ) : (
-                                                    <>
-                                                        <div className="flex items-center gap-2 mb-1">
-                                                            <h4 className="font-bold text-lg text-gray-900">{item.name}</h4>
-                                                            <span className={`text-[10px] px-1.5 py-0.5 rounded text-white font-bold ${item.food_type === 'VEG' ? 'bg-green-500' : 'bg-red-500'}`}>{item.food_type}</span>
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <h4 className="font-bold text-lg text-gray-900">{item.name}</h4>
+                                                                <span className={`text-[10px] px-1.5 py-0.5 rounded text-white font-bold ${item.food_type === 'VEG' ? 'bg-green-500' : 'bg-red-500'}`}>{item.food_type}</span>
+                                                            </div>
+                                                            <p className="text-gray-600 text-sm leading-relaxed mb-4">{item.description}</p>
                                                         </div>
-                                                        <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
-                                                    </>
+                                                        <div className="flex flex-col items-end gap-2 shrink-0 ml-4">
+                                                            <div className="text-lg font-bold text-gray-900">₹100</div>
+
+                                                            {/* Capacity Logic */}
+                                                            {item.max_orders && item.current_orders >= item.max_orders ? (
+                                                                <span className="text-red-500 font-medium text-sm">Sold Out</span>
+                                                            ) : (
+                                                                <button
+                                                                    onClick={() => handleAddToCart(item, dateStr)}
+                                                                    disabled={addingItem === item.id}
+                                                                    className="bg-green-50 text-green-700 hover:bg-green-600 hover:text-white font-medium py-1.5 px-4 rounded text-sm transition-colors disabled:opacity-50"
+                                                                >
+                                                                    {addingItem === item.id ? 'Adding...' : 'Add to Cart'}
+                                                                </button>
+                                                            )}
+                                                            {item.max_portions && (
+                                                                <span className="text-xs text-gray-400">{item.max_portions - item.current_portions} portions left</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 )
                                             ) : (
                                                 <div className="h-full flex items-center text-gray-300 italic">Menu not published yet</div>
@@ -137,50 +179,33 @@ export default function VendorProfilePage() {
 
                 </div>
 
-                {/* Right Col: Plans & Checkout Sticky */}
+                {/* Right Col: Info Sticky */}
                 <div className="w-full lg:w-96 shrink-0">
                     <div className="sticky top-8 space-y-6">
 
                         <div className="bg-white rounded-xl shadow-sm border p-6">
-                            <h2 className="text-xl font-bold mb-4">Choose a Subscription</h2>
+                            <h2 className="text-xl font-bold mb-4">Start Ordering</h2>
+                            <p className="text-gray-600 text-sm mb-6">Build your cart by adding meals from the menu. You can order lunch, dinner, or both for any available days this week.</p>
 
-                            <div className="space-y-4">
-                                {plans.length === 0 ? (
-                                    <div className="text-gray-500 italic text-center py-4 bg-gray-50 rounded">No active plans available right now.</div>
-                                ) : (
-                                    plans.map(plan => (
-                                        <div key={plan.id} className="border rounded-lg p-4 hover:border-green-500 transition-colors cursor-pointer group">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div>
-                                                    <h3 className="font-bold group-hover:text-green-600">{plan.name}</h3>
-                                                    <div className="text-xs text-gray-500">{plan.duration_days} Days · {plan.meal_type}</div>
-                                                </div>
-                                                <div className="text-lg font-extrabold text-gray-900">₹{plan.price}</div>
-                                            </div>
-                                            {plan.description && <p className="text-sm text-gray-600 mb-4">{plan.description}</p>}
-                                            <Link
-                                                to={`/checkout/${plan.id}`}
-                                                className="block w-full text-center bg-green-50 text-green-700 font-medium py-2 rounded group-hover:bg-green-600 group-hover:text-white transition-colors"
-                                            >
-                                                Subscribe
-                                            </Link>
-                                        </div>
-                                    ))
+                            <div className="bg-green-50 rounded-lg p-4 mb-4">
+                                <h4 className="font-bold text-green-800 text-sm mb-1">Minimum 3 Portions</h4>
+                                <p className="text-green-700 text-xs text-balance">To keep deliveries efficient, please ensure you add at least 3 portions from this chef before checking out.</p>
+                            </div>
+
+                            <div className="space-y-3 text-sm">
+                                {vendor.delivery_charge && (
+                                    <div className="flex justify-between items-center text-gray-700 border-t pt-3">
+                                        <span>Delivery Charge</span>
+                                        <span className="font-medium">₹{vendor.delivery_charge} / trip</span>
+                                    </div>
+                                )}
+                                {vendor.collection_enabled && (
+                                    <div className="flex justify-between items-center text-gray-700 border-t pt-3">
+                                        <span>Self-Pickup</span>
+                                        <span className="font-medium text-green-600">Available</span>
+                                    </div>
                                 )}
                             </div>
-                        </div>
-
-                        <div className="bg-gray-100 rounded-xl p-6 text-sm text-gray-600">
-                            <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                                {/* Info Icon Mock */}
-                                <span className="bg-gray-300 text-white rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px]">i</span>
-                                How Subscriptions Work
-                            </h4>
-                            <ul className="list-disc pl-5 space-y-2">
-                                <li>Pause your subscription anytime if you're out of town.</li>
-                                <li>Delivery times depend on the chef's windows.</li>
-                                <li>Payments are processed securely via Dabbaz.</li>
-                            </ul>
                         </div>
 
                     </div>

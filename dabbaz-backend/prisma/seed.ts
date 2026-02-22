@@ -99,6 +99,19 @@ const VENDORS = [
 async function main() {
     console.log('Starting DB Seed with 10 vendors and 14 days of menus...');
 
+    // 0. Base Settings & GST
+    const settings = await prisma.platformSettings.findUnique({ where: { id: 1 } });
+    if (!settings) {
+        await prisma.platformSettings.create({ data: { id: 1 } });
+    }
+
+    const gstRate = await prisma.gSTRate.findFirst({ where: { sac_code: '996812' } });
+    if (!gstRate) {
+        await prisma.gSTRate.create({
+            data: { name: 'Delivery Service', rate: 18.00, taxable_percentage: 100.00, sac_code: '996812', is_active: true }
+        });
+    }
+
     // 1. Admin & Customer
     await prisma.user.upsert({
         where: { email: 'admin@dabbaz.com' },
@@ -119,13 +132,26 @@ async function main() {
         const v = VENDORS[i];
 
         // Create User
-        const user = await prisma.user.create({
-            data: { email: v.email, name: v.name, role: 'VENDOR', phone: `400${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`, phone_verified: true, referral_code: `VEND${100 + i}${Date.now().toString().slice(-4)}` },
+        const user = await prisma.user.upsert({
+            where: { email: v.email },
+            update: {},
+            create: { email: v.email, name: v.name, role: 'VENDOR', phone: `400${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`, phone_verified: true, referral_code: `VEND${100 + i}${Date.now().toString().slice(-4)}` },
         });
 
         // Create Profile
-        const profile = await prisma.vendorProfile.create({
-            data: {
+        const profile = await prisma.vendorProfile.upsert({
+            where: { user_id: user.id },
+            update: {
+                delivery_charge: 20,
+                collection_enabled: true,
+                collection_address_lunch: 'Main Gate',
+                collection_address_dinner: 'Main Gate',
+                collection_lunch_window_start: '12:00',
+                collection_lunch_window_end: '14:00',
+                collection_dinner_window_start: '19:00',
+                collection_dinner_window_end: '21:00'
+            },
+            create: {
                 user_id: user.id,
                 business_name: v.business_name,
                 slug: v.slug,
@@ -144,6 +170,14 @@ async function main() {
                 bank_account_number: `000000000${i}`,
                 bank_ifsc: `HDFC0000${String(i).padStart(3, '0')}`,
                 active_subscriber_count: Math.floor(Math.random() * 30),
+                delivery_charge: 20,
+                collection_enabled: true,
+                collection_address_lunch: 'Main Gate',
+                collection_address_dinner: 'Main Gate',
+                collection_lunch_window_start: '12:00',
+                collection_lunch_window_end: '14:00',
+                collection_dinner_window_start: '19:00',
+                collection_dinner_window_end: '21:00'
             }
         });
 

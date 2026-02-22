@@ -1,0 +1,1057 @@
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+ 
+DABBAZ
+ 
+Tiffin Marketplace Platform
+ 
+Product Requirements Document
+ 
+ 
+Version 1.3  |  February 2026  |  Confidential 
+MVP —  Single City Launch 
+ 
+ 
+1. Executive Summary 
+Dabbaz is a two-sided marketplace platform connecting home tiffin and meal service providers 
+(vendors) with customers who want reliable, home-cooked daily meal subscriptions. Think of it 
+as Zomato, but purpose-built for the subscription-based dabba economy —  designed for 
+working professionals, students, and families who want wholesome meals without the overhead 
+of cooking or the cost of restaurant dining. 
+ 
+The platform serves three distinct stakeholders: customers who discover, subscribe to, and 
+manage tiffin deliveries; vendors (home chefs, tiffin operators, cloud kitchens) who manage their 
+menus, subscriptions, and finances through a dedicated dashboard; and platform administrators 
+who oversee onboarding, approvals, payments, and overall ecosystem health. 
+ 
+This document outlines the full product requirements for the Dabbaz MVP, targeting a single-city 
+launch. Delivery logistics are handled by vendors themselves —  Dabbaz does not operate its 
+own delivery fleet in this phase. 
+ 
+ 
+----------------Page (0) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+2. Assumptions & Constraints 
+2.1 Key Assumptions 
+•     Delivery Model: Vendors are responsible for their own delivery. Dabbaz does not 
+manage delivery partners in the MVP. 
+•     Geography: Single-city MVP launch. Multi-city support is a future phase. 
+•     Platform Name: Dabbaz (brand guidelines to be provided separately; visual design 
+tokens to be updated post-handoff). 
+•     Language: English for MVP. Vernacular language support is a Phase 2 consideration.  
+•     Payments: Platform-managed; vendors receive payouts on a defined settlement cycle. 
+Razorpay or Stripe India recommended as payment gateway. 
+ 
+2.2 Out of Scope (MVP) 
+•     Platform-managed delivery / delivery partner module 
+•     Multi-city / multi-region support 
+•     Native mobile apps (iOS / Android) —  MVP is mobile-responsive web; app is Phase 2 
+•     In-app chat between users and vendors 
+•     AI-powered recommendations or personalization engine  
+•     Third-party integrations (Swiggy, Zomato aggregator APIs)  
+ 
+ 
+3. Goals & Success Metrics 
+3.1 Product Goals 
+•     G1 —  Trust & Transparency: Make it easy for users to evaluate vendors through 
+verified profiles, ratings, and standardized menus before committing to a subscription.  
+•     G2 —  Vendor Empowerment: Give vendors full control over their menu, pricing, 
+delivery windows, and subscription offerings through an intuitive admin dashboard, with 
+zero need for external tools.  
+•     G3 —  Retention-First Subscriptions: Reduce subscription churn through flexible 
+pause/skip mechanics, proactive notifications, and transparent credit/refund handling.  
+•     G4 —  Platform Integrity: Prevent spam vendor registrations and ensure only legitimate, 
+verified operators are onboarded.  
+ 
+3.2 Success Metrics (6 months post-launch) 
+Metric                                       Target                             Notes 
+----------------Page (1) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+Active subscribers                      500+                                Users with at least 1 active subscription  
+Active vendors                            30+                                  Approved vendors with at least 1 live 
+plan 
+Subscription renewal rate             >65%                               Users renewing after first subscription 
+cycle 
+Vendor onboarding time               <48 hours                         From request submission to approval  
+Support complaint rate                <5%                                 Complaints per total deliveries  
+Payment success rate                 >98%                               Successful transactions / total attempts  
+ 
+ 
+4. User Personas 
+4.1 Rohan —  The Busy Professional 
+Age/Context: 28, software engineer, lives alone in a 1BHK, works long hours. 
+Pain Points: Too tired to cook; orders from restaurants but finds it expensive and unhealthy 
+daily; wants consistent home-cooked meals. 
+Goals: Subscribe to a reliable tiffin service, know what he's eating each day, pause when 
+travelling. 
+Key Features He'll Use: Discovery, veg filter, weekly menu calendar, subscription + 
+pause/skip, delivery status notifications. 
+ 
+4.2 Meera —  The Home Chef Vendor 
+Age/Context: 42, experienced home cook, runs a small tiffin operation serving ~20 clients via 
+WhatsApp today. 
+Pain Points: Managing orders over WhatsApp is chaotic; no visibility into revenue; struggles to 
+grow beyond referrals. 
+Goals: Go digital, manage all orders in one place, set her menu for the week in advance, 
+receive payments directly. 
+Key Features She'll Use: Vendor onboarding, menu calendar builder, subscription plan 
+management, vendor dashboard, payout reports. 
+ 
+4.3 Admin —  The Platform Operator 
+Context: Internal Dabbaz team member managing the ecosystem. 
+Goals: Approve/reject vendor applications, resolve disputes, monitor platform health, manage 
+payouts. 
+----------------Page (2) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+Key Features Used: Platform admin dashboard, vendor review queue, user management, 
+dispute handling, payout management. 
+ 
+ 
+5. Feature Specifications 
+5.1 Authentication & User Management 
+5.1.1 Sign Up & Login 
+Users and vendors share a single auth entry point. Account creation is a byproduct of checkout 
+—  not a prerequisite to browsing or adding to cart. 
+•     Primary Authentication —  Phone + OTP: The main way users log in and register. User 
+enters their mobile number, receives a 6-digit OTP via SMS (MSG91), enters it, and is 
+authenticated. If no account exists for that number, one is created automatically in the 
+same step. No password is ever set or required. Returning users log in the same way —  
+phone number → OTP → done. This is the default flow for all customers who come 
+through the cart-first journey. 
+•     Alternative Authentication —  Google OAuth 2.0: Users can sign in with their Google 
+account as an alternative to phone+OTP. On first Google sign-in, an account is created 
+using the Google email and name. The user is then prompted to add and verify a phone 
+number before they can place an order (phone is required for delivery coordination). 
+•     No Email + Password: Email and password-based auth is not offered. This removes 
+password management complexity and aligns with how most Indian consumer apps 
+authenticate users. 
+•     Session Management: JWT-based auth with refresh tokens. Access token expires in 
+15 minutes; refresh token valid for 30 days. Stored in localStorage on the frontend. 
+•     Account Deletion: Users can request account deletion from profile settings; data is soft-
+deleted for 30 days before permanent removal. 
+ 
+5.1.2 Role System 
+•     CUSTOMER —  Default role created on first OTP verification or Google sign-in. Can 
+browse, add to cart, subscribe, manage deliveries. 
+•     VENDOR —  Assigned after successful onboarding approval. Gets access to vendor 
+dashboard. 
+•     ADMIN —  Internal only. Assigned manually by super-admin. Full platform access. 
+ 
+5.2 Vendor Onboarding & Verification 
+5.2.1 Onboarding Request Flow 
+Any logged-in user can submit a vendor onboarding request. The flow is multi-step to gather 
+necessary information and filter out low-effort or spam submissions. 
+----------------Page (3) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Step 1 —  Eligibility Check: User must have a verified email and a verified mobile 
+number (OTP to phone required before proceeding). This is the primary anti-spam gate. 
+•     Step 2 —  Business Details Form: Business/kitchen name, contact person name, 
+address, PIN code, years of operation, approximate current daily capacity (number of 
+tiffins). 
+•     Step 3 —  Document Upload: FSSAI license (mandatory), a government ID of 
+proprietor, and optionally a kitchen hygiene certificate. Files are validated for format and 
+size. 
+•     Step 4 —  Sample Menu Submission: A brief description of typical meals offered (text + 
+optional photos). Helps admin evaluate before calling. 
+•     Step 5 —  Declaration & Submit: Checkbox confirming accuracy of information. 
+reCAPTCHA v3 score evaluated server-side. 
+ 
+5.2.2 Anti-Spam Measures 
+•     Phone OTP verification (Twilio / MSG91) mandatory —  one verified phone per vendor 
+application. 
+•     reCAPTCHA v3 on submission —  requests with low scores are flagged for manual 
+review. 
+•     Duplicate detection: same phone number or FSSAI number cannot be submitted twice. 
+•     Rate limiting: maximum 3 onboarding submissions per IP per 24 hours. 
+•     Application fee consideration (Phase 2): a nominal refundable INR 99 application fee as 
+a future friction layer. 
+ 
+5.2.3 Admin Review & Approval 
+•     All applications land in the Admin's Vendor Review Queue with a status of PENDING. 
+•     Admin can view all submitted details and documents, and change status to: 
+APPROVED, REJECTED, or NEEDS_MORE_INFO. 
+•     On APPROVED: vendor account type is upgraded, a welcome email is sent with a 
+getting-started guide, and the vendor dashboard is unlocked. 
+•     On REJECTED: rejection reason is sent via email. The same phone number is blocked 
+from re-applying for 30 days. 
+•     On NEEDS_MORE_INFO: applicant receives an email with specific items to resubmit. 
+Application is not closed. 
+ 
+5.3 Vendor Profile & Customer Discovery 
+5.3.1 Vendor Public Profile 
+Each approved vendor gets a public profile page that serves as their storefront on Dabbaz. 
+•     About Section: Kitchen story, who's cooking, years of experience, specialties. Rich text 
+editor in the vendor dashboard. 
+•     Cuisine Tags: Multi-select tags such as North Indian, South Indian, Jain, Bengali, etc. 
+----------------Page (4) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Veg / Non-Veg / Both Indicator: Prominently displayed green/brown badge on profile 
+card and listing. 
+•     FSSAI Verified Badge: Shown once document is confirmed by admin. Trust signal for 
+users. 
+•     Delivery Areas: Vendor specifies deliverable PIN codes or neighbourhoods. This is 
+used for filtering on the discovery page. 
+•     Delivery Windows: Separate configurable time ranges for Lunch (e.g., 12:00 PM – 1:30 
+PM) and Dinner (e.g., 7:30 PM – 9:00 PM). Shown as informational for users. 
+•     Daily Capacity Cap: Vendor sets a maximum number of tiffins they can fulfill per day 
+(e.g., 25). Once active subscriptions reach this cap, the Subscribe button is disabled and 
+the listing shows a 'Full —  Not Accepting New Subscribers' badge. The cap can be 
+updated at any time from the vendor dashboard, and increasing it immediately re-opens 
+subscriptions. 
+•     Photos: Up to 8 food photos. First photo is the cover image on listing cards. 
+•     Ratings & Reviews: Aggregate star rating, total review count, and paginated reviews 
+with user name, date, and comment. 
+ 
+5.3.2 Discovery & Filtering 
+•     Home page shows vendor listing cards sorted by rating (default). 
+•     Filters: Veg / Non-Veg / Both; Delivery Area (PIN code entry or neighbourhood 
+dropdown); Meal Type (Lunch / Dinner / Both); Price Range; Cuisine Tags; Available 
+Only (hides vendors at capacity). 
+•     Search bar: full-text search across vendor name, cuisine tags, and about text. 
+•     Vendor cards show: name, cover photo, cuisine tags, veg/non-veg badge, star rating, 
+starting price, delivery areas. Cards at full capacity show a 'Full' badge and the 
+Subscribe button is replaced with a greyed-out 'At Capacity' indicator. 
+ 
+5.4 Standardized Menu Management (Calendar Format) 
+5.4.1 Overview 
+Vendors set their menu in a weekly calendar view. This gives users full visibility into what they 
+will receive on any given day before subscribing —  a core trust and differentiation feature. 
+ 
+5.4.2 Menu Builder (Vendor Dashboard) 
+•     Calendar View: A 7-column (Mon–Sun) grid. Vendors can toggle between Lunch and 
+Dinner menus using a tab. 
+•     Day Cell: Each cell shows the meal name, a short description (up to 120 characters), 
+meal type badge (Veg/Non-Veg), and an optional photo. 
+•     Add / Edit Meal: Clicking a day cell opens a slide-over panel to set: Meal Name, 
+Description, Veg/Non-Veg toggle, Photo upload, Addons available for that day. 
+•     Recurring Templates: Vendor can save a week as a template and apply it to future 
+weeks. Reduces repetitive entry. 
+----------------Page (5) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Holiday / Full Day Off: Vendor can mark a specific day as entirely closed (no lunch, no 
+dinner). These days are shown to users as 'Off' with no charge against their 
+subscription. 
+•     Slot-Level Disabling: Independently of a full off-day, vendors can disable just Lunch or 
+just Dinner on any given day. For example: mark Wednesday lunch as unavailable while 
+still serving dinner. This is more granular than a full off-day and reflects how real home 
+kitchens operate. Disabled slots show to users as 'Not available today' and are not 
+charged. 
+•     Publish / Draft: Menu for any given week can be saved as Draft until the vendor is 
+ready to publish. Published menus are visible to subscribers immediately. 
+•     Advance Planning: Vendors can plan up to 8 weeks ahead. Menu for the current week 
+must be published by a configurable cutoff (default: Sunday 11:59 PM for the upcoming 
+week). 
+ 
+5.4.3 Addons 
+•     Addon Definition: Vendors define a global addon list (e.g., Extra Roti x2, Sweet of the 
+Day, Raita, Extra Dal). Each has a name, price, and veg/non-veg flag. 
+•     Day-Level Addon Availability: When editing a day's meal, the vendor toggles which 
+global addons are available that day. 
+•     User Addon Selection: Users can select addons per day from their subscription 
+management screen. Addon charges are added to the next billing cycle or invoiced 
+separately based on configuration. 
+ 
+5.4.4 User-Facing Menu View 
+•     Users see a read-only version of the same weekly calendar on the vendor's profile. 
+•     They can scroll forward/backward by week. Future weeks show 'Menu not yet published' 
+if unpublished. 
+•     Each day cell is expandable to show full meal details and available addons. 
+ 
+5.5 Subscription Plans (Phase 2 —  Not in MVP) 
+Recurring subscription plans are deferred to Phase 2. The MVP is built entirely on the cart 
+model —  users pick specific days and pay once per order. The database schema retains the 
+Subscription, SubscriptionPlan, and related tables so Phase 2 can be built on top without 
+schema migrations. 
+Phase 2 subscription features will include: recurring plan configuration by vendors, minimum 
+duration enforcement, pause/skip/cancel with credit rollover, auto-renewal, and active 
+subscriber management. All of these are documented in the schema for forward compatibility 
+but no UI or API routes are built for them in the MVP. 
+ 
+5.6 Payment Architecture 
+5.6.1 Payment Methods 
+----------------Page (6) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Payment Gateway: Razorpay for India, supporting UPI, Credit/Debit Cards, and Net 
+Banking. 
+•     Cart Checkout Payment: User is charged the full cart total in a single Razorpay 
+transaction. No recurring billing in MVP. 
+•     Payment Method Selection: At checkout, user chooses one of three options —  Wallet 
+(if balance covers full order amount), Card/Net Banking, or UPI. Wallet is only selectable 
+if the balance covers the full order total. Partial wallet payment is not supported in MVP. 
+•     Failed Payment Handling: If payment fails or user drops off from Razorpay, the cart is 
+preserved entirely. A fresh Razorpay order is created on retry. Razorpay order link 
+expires after 15 minutes of inactivity. Cart is only cleared on confirmed successful 
+payment. 
+•     Payment Receipt: Automated email receipt sent to customer on every successful 
+payment. Contains itemised order summary. 
+ 
+5.6.2 Platform Wallet 
+•     Wallet Purpose: The wallet is a credit store for each user. In MVP its primary purpose is 
+to receive refund credits from order cancellations and admin-issued complaint refunds. 
+Users can also use their wallet balance to pay for orders. 
+•     Wallet Top-Up Toggle: A global admin switch controls whether users can load money 
+into their wallet. When ON: users can top up via Razorpay and use the wallet as an 
+alternative payment method. When OFF: no new top-ups, but existing balance remains 
+spendable and the wallet continues to receive refund credits. 
+•     Wallet Balance Display: Always visible on the customer dashboard and checkout page 
+regardless of toggle state. 
+•     Wallet Transaction Categories: Every wallet credit or debit is tagged with a category 
+for transparency in the customer's wallet history: 
+•     TOP_UP —  user manually loaded money into wallet (only when toggle is ON) 
+•     CANCELLATION_CREDIT —  customer cancelled a day's delivery before the 9 PM 
+cutoff. Amount = meal price minus the configurable cancellation fee. Tagged with the 
+specific order and date. 
+•     VENDOR_CANCELLATION_CREDIT —  vendor marked a day as Off after customer 
+had already paid. Full meal amount credited, no cancellation fee deducted. 
+•     REFUND_COMPLAINT —  admin manually issued a credit following a customer 
+complaint. Tagged with the complaint context. 
+•     PAYMENT_DEBIT —  wallet used to pay for an order. 
+ 
+5.6.3 Cancellation Fee 
+•     Structure: A globally configurable flat fee (set in admin Platform Config, e.g. ₹20) is 
+deducted from the meal price when a customer cancels a day's delivery. The fee 
+represents platform revenue. Example: meal priced at ₹150, cancellation fee ₹20, 
+customer receives ₹130 as CANCELLATION_CREDIT. 
+•     Vendor-initiated Day Off: No cancellation fee applies. Customer receives the full meal 
+amount as VENDOR_CANCELLATION_CREDIT. 
+ 
+----------------Page (7) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+5.6.4 Vendor Payouts (Phase 2) 
+Vendor payout architecture, commission splits, Razorpay Route configuration, and the payout 
+dashboard are deferred to Phase 2. The payment model (platform-collected vs vendor-direct) is 
+a pending business decision. For MVP, vendor settlements are handled manually. 
+ 
+5.7 Delivery & Notifications 
+5.7.1 MVP Delivery Model 
+Vendors handle delivery themselves. Dabbaz does not provide GPS tracking or a courier 
+network. The delivery coordination in MVP is intentionally lightweight —  the vendor dispatches 
+the order and triggers a notification to the customer. No further status granularity is required for 
+launch. 
+•     Dispatch Action: Vendor opens their daily order list on the dashboard and clicks 'Mark 
+as Dispatched' per order. This is the only delivery status action in MVP. 
+•     Customer Notification on Dispatch: When vendor clicks dispatch, the system 
+immediately sends the customer: (1) a WhatsApp message via Interakt/Wati using a pre-
+approved template (e.g., 'Your tiffin from [Vendor Name] is on its way!'), and (2) an email 
+via Resend as fallback. Both fire simultaneously. 
+•     Order Freeze at 9 PM: Each night at 9 PM IST, the system freezes all orders for the 
+following day. After 9 PM, customers cannot cancel or modify the next day's delivery. 
+The cutoff time (9 PM) is configurable from the admin Platform Config panel. 
+•     Phase 2 Delivery Features: In-app delivery status tracking (Preparing → Out for 
+Delivery → Delivered → Not Delivered), WhatsApp notifications to vendors on new 
+orders and cancellations, and consolidated daily delivery count view for vendors are all 
+deferred to Phase 2. 
+ 
+5.7.2 MVP Notification Events 
+Event                                        Recipient                        Channel (MVP) 
+Order placed successfully            Customer                         Email receipt 
+Order placed (new order 
+arrived) 
+Vendor                             Email + visible in dashboard 
+Vendor marks order 
+Dispatched 
+Customer                         WhatsApp + Email 
+Customer cancels a day's 
+order 
+Customer                         Email confirmation + wallet credit 
+Vendor marks day as Off             Customer                         Email + wallet credit notification 
+Admin issues complaint 
+refund 
+Customer                         Email with credit details 
+ 
+5.8 Ratings & Reviews (Phase 2 —  Not in MVP) 
+----------------Page (8) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+The ratings and reviews system is deferred to Phase 2. Users need a history of orders before 
+reviews are meaningful. The Review table exists in the schema for future use. 
+ 
+5.9 Meal Preferences & Dietary Customization (Phase 2 —  Not in MVP) 
+Detailed dietary preference profiles, vendor accommodation flags, and per-order allergy notes 
+are deferred to Phase 2. For MVP, vendors can include dietary information in their menu item 
+descriptions. Customers can add a free-text delivery note at checkout. 
+ 
+5.10 Vendor Dashboard 
+5.10.1 Overview 
+The vendor dashboard is a dedicated interface accessible post-login for approved vendor 
+accounts. Mobile-responsive. MVP scope is focused on profile setup, menu management, and 
+daily order operations. 
+ 
+5.10.2 MVP Dashboard Modules 
+Module                               MVP Features 
+Home                                  Today's order count, list of upcoming orders for the next 7 days, any 
+days marked Off. 
+Menu Manager                    Weekly calendar builder for current week and next week. Per -day, per-
+meal-type entry (Lunch and Dinner separately). Each meal slot has: 
+name, description, food type (Veg/Non-Veg), photo upload, price (INR). 
+Mark full day as Off. Publish/unpublish week. If a day is not published, 
+customers see 'Menu not yet published' for that day.  
+Today's Orders                    List of all orders for today showing: customer name, phone number, 
+delivery address, meal type (Lunch/Dinner), any addons, delivery note. 
+'Mark as Dispatched' button per order —  triggers customer WhatsApp + 
+email notification. 
+Order History                       Past orders by date. View customer details per order.  
+Day Off Management           Vendor can mark any future day as Off. If customers have already paid 
+for that day, the system automatically credits their wallets in full 
+(VENDOR_CANCELLATION_CREDIT, no fee). Vendor sees a count of 
+affected customers before confirming. 
+Profile Settings                    Business name, about, cuisine tags, food type (Veg/Non -Veg/Both), 
+delivery pincodes, lunch and dinner time windows, cover photo, gallery 
+photos, FSSAI number. 
+ 
+5.10.3 Phase 2 Vendor Features 
+The following are deferred to Phase 2: subscription plan builder, subscriber management list, 
+earnings and payout dashboard, reviews management, consolidated daily order count by area, 
+----------------Page (9) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+individual customer order cancellation, WhatsApp notifications to vendors, and addon library 
+management. 
+ 
+5.11 Platform Admin Dashboard 
+5.11.1 Overview 
+The platform admin dashboard is for internal Dabbaz operators. Accessible only via admin-role 
+accounts. MVP scope covers vendor management, customer support, and platform 
+configuration. 
+ 
+5.11.2 MVP Admin Modules 
+Module                               MVP Features 
+Vendor Queue                     Pending onboarding applications with submitted details, documents 
+(FSSAI, Govt ID), reCAPTCHA score. Approve / Reject / Request More 
+Info actions. Admin can also manually create a vendor account directly.  
+Vendor Management            List of all vendors (active, pending, rejected). View vendor profile and 
+order history. Suspend or reinstate a vendor.  
+User Management                Search users by phone or name. View order history. Issue wallet credits 
+(REFUND_COMPLAINT category). Suspend accounts.  
+Order Management              View all orders across all vendors and customers. Filter by date, vendor, 
+status. Look up a specific order for support resolution.  
+Platform Config                    Global settings: Wallet Top-Up Toggle (ON/OFF), Cancellation Fee (flat 
+INR amount, e.g. ₹20), Order Freeze Time (default 21:00 IST, 
+configurable). Changes take effect immediately.  
+ 
+5.11.3 Phase 2 Admin Features 
+The following are deferred to Phase 2: platform metrics dashboard (GMV, active users, 
+revenue), vendor payout queue and reconciliation, disputes module, reviews moderation, 
+reporting and CSV exports. 
+ 
+5.12 Trial Meal & Referral System (Phase 2 —  Not in MVP) 
+Trial meals and the referral system are deferred to Phase 2. In the MVP, cart-based one-off 
+ordering already allows users to try a vendor without committing to a subscription. Referral 
+codes and reward logic will be added in Phase 2. 
+ 
+5.13 Customer Support & Dispute Flow 
+•     Help Centre: A static FAQ page covering common questions: how the cart works, 
+cancellation policy, refund policy, how to report a missing delivery. 
+----------------Page (10) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Report an Issue: For MVP, customer contacts support via email (support@dabbaz.in). 
+Admin manually investigates and issues REFUND_COMPLAINT wallet credit if 
+warranted. 
+•     Phase 2: In-app dispute form, vendor response workflow, automated SLA tracking, and 
+structured resolution flow are all Phase 2. 
+ 
+5.14 Order Cancellation & Modification 
+5.14.1 Day-Level Cancellation by Customer 
+•     What can be cancelled: A customer can cancel any individual day's meal from a placed 
+cart order —  for example, cancelling Wednesday's lunch from Vendor A while keeping 
+all other days active. 
+•     Cancellation Window: Cancellation is allowed up to 9:00 PM IST the night before the 
+delivery date. After 9:00 PM, that day's delivery is frozen and cannot be cancelled. The 
+cutoff time is configurable from admin Platform Config. 
+•     Cancellation Credit: On successful cancellation, the customer receives a 
+CANCELLATION_CREDIT in their wallet equal to the meal price minus the global 
+cancellation fee (e.g., ₹150 meal − ₹20 fee = ₹130 credit). The ₹20 fee is platform 
+revenue. 
+•     Vendor Visibility: The vendor's dashboard reflects the cancellation —  the cancelled 
+order disappears from their next-day delivery list after the 9 PM freeze. Vendors are 
+expected to check their dashboard each evening for the next day's confirmed list. 
+ 
+5.14.2 Vendor-Initiated Day Off 
+•     Action: Vendor marks a future day as Off from their dashboard. Before confirming, they 
+see a count of customers who have paid orders for that day. 
+•     Automatic Credit: The system immediately credits every affected customer's wallet with 
+the full meal amount as VENDOR_CANCELLATION_CREDIT. No cancellation fee is 
+deducted —  the vendor is responsible for the disruption. 
+•     Customer Email: Each affected customer receives an email informing them that Vendor 
+X is unavailable on that date and that their wallet has been credited. 
+•     Scope: In MVP, vendor cancellation applies to the whole day for all customers. 
+Individual order cancellation by vendor is a Phase 2 feature. 
+ 
+5.14.3 The 9 PM Order Freeze 
+•     What freezes: All orders for the following day are locked at 9:00 PM IST. No customer 
+cancellations or modifications are accepted after this point. 
+•     What this enables: Vendors can check their finalised delivery list after 9 PM and 
+prepare the exact number of meals without uncertainty. 
+•     Configurable: The freeze time is a platform config setting (default 21:00 IST). Admin 
+can adjust it without a code change. 
+ 
+----------------Page (11) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+5.15 Cart with Calendar View 
+5.15.1 Overview 
+The cart is the primary ordering mechanism in MVP. No login required to add to cart. Account 
+creation happens at checkout as a natural part of providing delivery details. 
+ 
+5.15.2 Menu Structure 
+•     Per-Day, Per-Meal-Type: Each day on a vendor's menu has two separate slots —  
+Lunch and Dinner. Each slot is independently priced. A vendor can publish Lunch only, 
+Dinner only, or both for any given day. 
+•     Per-Day Pricing: Vendors set the price for each individual meal slot. Different days can 
+have different prices —  e.g., ₹150 for weekday lunch, ₹180 for Saturday lunch. 
+•     Availability Window: Customers can see the current week and next week's published 
+menu. If a day or slot is not yet published, the calendar shows 'Menu not yet published' 
+for that slot. 
+ 
+5.15.3 Adding to Cart 
+•     Entry Point: On the vendor profile page, the menu is displayed as a two-week calendar. 
+Each day shows Lunch and Dinner slots with the meal name, food type badge, and 
+price. A meal slot that is published and available has an 'Add' button. Clicking Add adds 
+that specific slot (vendor + date + meal type) to the cart. 
+•     No Login Required: No authentication needed to add to cart. Cart is stored under a 
+session_id in the database. 
+•     Multi-Vendor: User can add meals from multiple vendors. Each vendor's items are 
+visually grouped in the cart. 
+•     Cart Persistence: Cart survives page refreshes and browser closes for up to 7 days. 
+Cleared only on successful payment. 
+•     Cart Icon: Persistent in navbar showing total item count. Visible on all pages. 
+ 
+5.15.4 Minimum Order Rule 
+•     Rule: A minimum of 3 meals must be selected from any single vendor within a calendar 
+week (Monday to Sunday) to include that vendor in checkout. Lunch and Dinner count 
+together —  2 lunches + 1 dinner from the same vendor = qualifies. 
+•     Real-Time Indicator: The cart calendar shows a per-vendor progress bar: 'X of 3 meals 
+this week from [Vendor Name]'. 
+•     Partial Checkout: If Vendor A qualifies (3+ meals) and Vendor B does not, checkout 
+prompts the user to either add more meals from Vendor B or remove Vendor B from the 
+order. The user can proceed with qualifying vendors only. 
+•     Server-Side Enforcement: The minimum rule is validated again server-side at payment 
+confirmation —  not just on the frontend. 
+ 
+5.15.5 Cart Calendar View 
+----------------Page (12) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Layout: Clicking the cart icon opens a calendar slide-over. Days with cart items are 
+highlighted. Each highlighted day shows the meal slots added —  vendor name, meal 
+name, meal type badge (L/D), price. 
+•     Edit & Remove: Each item has a Remove button. The calendar updates in real time. 
+•     Summary Footer: Sticky footer with total item count, per-vendor minimum status, 
+subtotal, and 'Proceed to Checkout' button. 
+ 
+5.15.6 Checkout Flow 
+•     Step 1 —  Vendor Validation: Server checks each vendor meets 3-meal minimum. Non-
+qualifying vendors flagged for user action. 
+•     Step 2 —  Your Details: If not logged in: user enters Full Name, Mobile Number, 
+Delivery Address (Line 1, Line 2, City, PIN Code). OTP sent to mobile. On verify: 
+account created or existing user logged in. Cart session merged to account. If already 
+logged in: user selects from saved addresses or adds new one. 
+•     Step 3 —  Payment: User selects payment method —  Wallet (only if balance ≥ order 
+total), Card, or UPI. GST breakdown shown. 'Pay ₹X' button initiates Razorpay. 
+•     Post-Payment: Individual Order records created per cart item. Cart cleared. Order 
+confirmation email sent to customer. New order notification email sent to each vendor. 
+ 
+ 
+5.16 How It Works Page 
+A public-facing marketing and explainer page accessible without login, linked from the main 
+navigation. Its purpose is to explain the Dabbaz model to first-time visitors and reduce drop-off 
+from users who do not understand the subscription/tiffin concept. 
+ 
+5.16.1 Page Sections 
+•     Hero Section: A headline and subheadline summarising the value proposition (e.g., 
+'Fresh home-cooked meals, delivered daily. No cooking. No restaurant prices.'). A 
+primary CTA button linking to the discovery page. 
+•     How It Works —  3 Steps: Step 1: Browse & discover local tiffin vendors near your office 
+or home. Step 2: Pick the days you want —  choose meals from the weekly menu 
+calendar, minimum 3 from any vendor. Step 3: Get fresh meals delivered daily. Each 
+step has an icon, a heading, and two to three sentences of explanation. 
+•     For Customers Section: Explains the cart model —  browse vendor menus, pick 
+specific days, pay once. Covers wallet credits, day-level cancellation before 9 PM, and 
+what happens when a vendor takes a day off. 
+•     For Vendors Section: Brief explainer for home chefs interested in joining. Covers the 
+onboarding process, menu calendar, daily order dashboard, and dispatch notifications. 
+Ends with a 'Become a Vendor' CTA button. 
+•     Trust Section: FSSAI-verified vendors, OTP-verified customers, platform-managed 
+secure payments, 9 PM order freeze protecting vendors from last-minute cancellations. 
+Displayed as icon + text tiles. 
+----------------Page (13) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     FAQ Accordion: 8–10 common questions such as: How does ordering work? Can I 
+cancel? What if my delivery doesn't arrive? How do I know what I'm eating each day? 
+Are vendors home cooks or restaurants? What is the minimum order? 
+•     Final CTA: Prominent button linking to the vendor discovery page. 
+ 
+5.16.2 Implementation Notes 
+•     This is a fully static page —  no API calls. All content is hardcoded. 
+•     It must load fast and render well on mobile —  this is likely the first page many users see. 
+•     Link it from: the main navigation bar, the footer, and the vendor listing page's empty 
+state. 
+ 
+5.17 Invoice & Receipt 
+5.17.1 MVP —  Basic Receipt Email 
+•     Trigger: Every successful payment sends an itemised receipt email to the customer via 
+Resend within 60 seconds. This is the MVP invoice. 
+•     Receipt Contents: Order summary with each meal (vendor name, date, meal type, 
+addons), GST breakdown (taxable value at 60%, CGST 2.5%, SGST 2.5%, effective 3% 
+total), payment method, Razorpay transaction ID, and total amount charged. Plain email 
+layout —  no PDF attachment in MVP. 
+•     Vendor Email: Vendor also receives an email listing the new orders just placed by the 
+customer. 
+ 
+5.17.2 Phase 2 —  PDF Invoices & Monthly Statements 
+The following invoice features are deferred to Phase 2: PDF invoice generation (PDFKit or 
+Puppeteer), downloadable invoices on the Payments page, automated consolidated monthly 
+statements, admin invoice ledger with resend capability, and vendor settlement invoices. The 
+Invoice and GSTRate tables exist in the schema for Phase 2 use. 
+ 
+5.18 GST Compliance 
+5.18.1 Applicable Tax Structure 
+Dabbaz operates in the food services category under Indian GST. The applicable rule for 
+restaurant/food supply services is the composite supply model —  5% GST applies on 60% of 
+the invoice value (the remaining 40% is exempt as the notional cost of raw materials). This 
+results in an effective GST rate of 3% on the total invoice amount. No Input Tax Credit (ITC) is 
+available under this scheme. 
+ 
+5.18.2 Tax Calculation Logic 
+Component                                  Formula                                     Example (₹200 order) 
+----------------Page (14) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+Invoice Amount                              Total charged to customer            ₹200.00 
+Taxable Value                               60% of Invoice Amount                 ₹120.00 
+GST (5% on taxable value)             5% × Taxable Value                     ₹6.00 
+Effective GST Rate                        GST / Invoice Amount                  3% 
+Amount Before Tax                        Invoice Amount − GST                 ₹194.00 
+ 
+5.18.3 Invoice GST Line Items 
+•     HSN/SAC Code: SAC code 996331 (Restaurant services including takeaway) to be 
+displayed on all invoices. 
+•     Invoice Display: Each invoice must show: subtotal (before tax), taxable value (60% of 
+subtotal), CGST (2.5% on taxable value), SGST (2.5% on taxable value), and total. 
+CGST and SGST are shown as separate line items as required under Indian GST law. 
+•     Vendor GST Number: Vendors who are GST-registered can add their GSTIN to their 
+profile. It is displayed on invoices where their meals are included. Vendors who are not 
+GST-registered are marked as 'Composition scheme / unregistered' on invoices. 
+ 
+5.18.4 Admin GST Reports —  Phase 2 
+Monthly GST summary reports (total taxable value, CGST, SGST collected), CSV export for 
+GST filing, and platform commission GST on vendor settlement invoices are all deferred to 
+Phase 2. The GSTRate table exists in the schema so rates are configurable without a code 
+change when Phase 2 is built. 
+ 
+ 
+5.19 Collection & Delivery Fulfilment Mode (Phase 2 —  Not in MVP) 
+This feature adds Collection as a second fulfilment mode alongside Delivery. Vendors opt in to 
+offering collection. Customers choose their mode per vendor at the time of adding to cart. 
+Pricing separates the meal base cost from a delivery surcharge, making the economics 
+transparent. This is a Phase 2 feature. The schema additions are included now for forward 
+compatibility. 
+ 
+5.19.1 Vendor Configuration 
+Vendors configure fulfilment from a dedicated Fulfilment tab in their profile settings. 
+•     Delivery Charge: A single flat INR delivery charge that applies uniformly across all the 
+vendor's meal slots (e.g. ₹20 per delivery event). Not per day and not per meal type —  
+one number for the whole vendor. Platform enforces a hard constraint: the delivery 
+charge cannot exceed the base meal price. 
+•     Collection Toggle: Off by default. When enabled, the vendor unlocks collection-specific 
+fields. 
+----------------Page (15) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Collection Addresses: Vendors set a Lunch collection address and a Dinner collection 
+address separately. These can differ from the kitchen's registered address and from 
+each other —  e.g. 'Society Gate B' for lunch and 'Building lobby entrance' for dinner. 
+•     Collection Windows: Vendors set separate time windows for Lunch collection and 
+Dinner collection —  e.g. Lunch 12:00–12:45 PM, Dinner 7:30–8:15 PM. 
+•     Per-Slot Fulfilment Override: In the menu builder, each day's meal slot can be 
+individually set to DELIVERY, COLLECTION, or BOTH, overriding the profile-level 
+default. This lets a vendor offer collection-only on days when they cannot arrange 
+delivery, without changing their profile. 
+ 
+5.19.2 Dual Capacity Caps (replaces single daily_capacity) 
+The existing single daily_capacity field on VendorProfile is superseded by two per-slot capacity 
+caps on MenuItem. These are set per meal slot, meaning Lunch and Dinner each have their 
+own independent caps. 
+•     Max Orders: Maximum number of distinct customer orders accepted for this slot. 
+Optional —  leave blank for no limit. 
+•     Max Portions: Maximum total tiffin boxes (portions) across all orders for this slot. 
+Optional —  leave blank for no limit. 
+•     Enforcement Rule: If an add-to-cart action would cause current_orders + 1 to exceed 
+max_orders, OR current_portions + quantity to exceed max_portions, the add is blocked. 
+Whichever cap is hit first wins. No partial accommodation —  the customer cannot reduce 
+quantity to squeeze in. The 'At Capacity' badge appears and the slot accepts no further 
+cart additions. 
+•     Capacity Reservation —  Option A: Counters (current_orders, current_portions) 
+increment at cart-add time and decrement on cart item removal or expiry. This means 
+the slot can show 'At Capacity' from cart reservations alone, not just paid orders. This 
+protects home vendors from over-commitment. The nightly cart expiry cron (7-day 
+cleanup) releases held capacity from abandoned carts automatically. 
+•     Checkout Re-validation: When the customer initiates payment (Razorpay order 
+creation), the backend re-validates both caps for every cart item before creating the 
+Razorpay order. If a slot has since been filled by another customer's reservation, 
+checkout is blocked and the customer is told which slot is unavailable —  no payment is 
+initiated and no money moves. There is no post-payment capacity check and no post-
+payment refund for capacity reasons. 
+ 
+5.19.3 Portions (Quantity per Slot) 
+Customers can order more than one portion of the same meal slot —  for example 2 boxes of 
+Monday's lunch to share with a colleague at the same office. 
+•     Minimum Order Rule Update: The minimum 3 meal units rule is measured in portions, 
+not delivery events. 1 slot × 3 portions = 3 units and satisfies the minimum. The spirit is 
+that the order must have sufficient value for both vendor and platform. The cart progress 
+indicator reads 'X of 3 meal units this week' with a tooltip explaining that each portion 
+counts as 1 unit. 
+----------------Page (16) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Cancellation with Portions: Cancellation is all-or-nothing per slot. A customer who 
+ordered a slot × 3 portions cancels all 3 at once. Credit = (base price × 3) − one flat 
+cancellation fee. Partial portion reduction (cancelling 1 of 3) is a Phase 3 feature.     
+•     Vendor Dashboard Display:  Order cards show quantity explicitly: 'Mon 24 Feb Lunch × 
+2 —  deliver to [address]' so the vendor knows exactly how many boxes to prepare. 
+ 
+5.19.4 Fulfilment Mode —  Customer Experience 
+•     Fulfilment Choice Per Vendor: When a customer adds their first slot from Vendor A, 
+they choose deliver everything from Vendor A or collect everything from Vendor A. This 
+choice applies to all of Vendor A's meals in their cart. They can mix across vendors —  
+collect from Vendor A and deliver from Vendor B simultaneously. 
+•     Changing Mode: A 'Change to Collection / Change to Delivery' option on the vendor's 
+group in the cart updates all that vendor's items simultaneously. 
+•     On the Vendor Profile Page: When a vendor offers BOTH modes, clicking Add on a 
+slot expands a selector showing: Deliver to my address (base price + '+ ₹X delivery per 
+delivery event') and Collect it myself (base price only, plus collection window and 
+address). If the vendor offers only one mode, no choice is presented —  the mode is 
+assumed. 
+•     At Checkout: If any vendor has Delivery selected, the delivery address input appears as 
+normal. If all vendors are Collection, the address input is replaced by collection summary 
+cards showing each vendor's collection address and window. Mixed carts show both. 
+ 
+5.19.5 Delivery Charge Calculation 
+A delivery event is a unique combination of date × meal type from the same vendor. Delivery 
+charge = number of unique delivery events × vendor's flat delivery rate. 
+Cart Contents from Vendor A (₹20 delivery 
+rate) 
+Delivery Events              Delivery Charge 
+Feb 23 Lunch × 2 portions                                       1                                    ₹20 
+Feb 23 Lunch + Feb 23 Dinner                                 2                                    ₹40 
+Feb 23 Lunch + Feb 24 Lunch + Feb 25 Dinner         3                                    ₹60 
+Feb 23 Lunch × 3 portions + Feb 24 Lunch × 1 
+portion 
+2                                    ₹40 
+ 
+5.19.6 Cart Display Format 
+The cart and checkout show an itemised per-vendor breakdown (Option A). Delivery charge is a 
+separate line under each vendor group, not blended into the meal price. Example for a mixed 
+cart: 
+•     Vendor A (Delivery): Mon 24 Feb Lunch × 2 = ₹400 | Tue 25 Feb Dinner × 1 = ₹180 | 
+Wed 26 Feb Dinner × 1 = ₹180 | Delivery (3 events × ₹20) = ₹60 | Vendor A subtotal = 
+₹820 
+•     Vendor B (Collection —  12:00–12:45 PM at Gate 2): Mon 24 Feb Lunch × 1 = ₹150 | 
+Wed 26 Feb Lunch × 1 = ₹150 | Vendor B subtotal = ₹300 
+----------------Page (17) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Grand Total: Food GST (3% effective) = ₹33 | Delivery GST (18% on ₹60) = ₹11 | 
+Grand total = ₹1,164 
+ 
+5.19.7 GST on Delivery Charge 
+•     Food Price GST: Composite supply, effective 3% as per current spec (SAC 996331). 
+•     Delivery Charge GST: 18% standard rate (9% CGST + 9% SGST) as applicable under 
+Indian GST for delivery services. Shown as a separate line item on the receipt and 
+invoice. The GSTRate table stores both rates —  no new infrastructure required. 
+ 
+5.19.8 No-Show on Collection Orders 
+If a customer selects collection but does not arrive to collect their tiffin, the order is treated as 
+complete from the vendor's side. The vendor is paid and no automatic refund is issued. 
+Customers who believe there are exceptional circumstances can contact Dabbaz support —  
+resolution is manual and at admin discretion. This policy is stated clearly in the FAQ and at the 
+point of selecting collection mode. 
+ 
+5.19.9 Vendor Order Dashboard Changes 
+•     Deliveries Section: Order cards show customer name, phone, delivery address, meal 
+name, quantity (× N), addons, delivery note. Action: 'Mark as Dispatched' —  fires 
+WhatsApp + email as currently specced. 
+•     Collections Section: Separate section on the daily orders page. Cards show customer 
+name, phone, meal name, quantity (× N), and collection window reminder. Action: 'Mark 
+as Ready for Collection' —  fires a notification to the customer: 'Your tiffin from [Vendor 
+Name] is ready. Collect by [end time] at [collection address].' 
+•     Collection Status Flow: PREPARING → READY_FOR_COLLECTION. A future 
+COLLECTED status can be added in Phase 3 if vendors want to confirm pickup 
+happened. 
+ 
+5.19.10 Discovery Page Filter 
+A single additional checkbox on the discovery page filter panel: 'Offers Collection'. Filters to 
+vendors where collection_enabled = true. One boolean WHERE clause —  minimal complexity. 
+Included from Phase 2 launch. 
+ 
+5.19.11 Schema Changes for Phase 2 
+•     VendorProfile additions: delivery_charge (Decimal, nullable), collection_enabled 
+(Boolean default false), collection_address_lunch (String?), collection_address_dinner 
+(String?), collection_lunch_window_start (String?), collection_lunch_window_end 
+(String?), collection_dinner_window_start (String?), collection_dinner_window_end 
+(String?). The existing daily_capacity field is retained for backward compatibility but 
+superseded by per-slot caps. 
+----------------Page (18) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     MenuItem additions: fulfilment_types (enum DELIVERY | COLLECTION | BOTH, 
+default DELIVERY), max_orders (Int?), max_portions (Int?), current_orders (Int default 
+0), current_portions (Int default 0). 
+•     CartItem additions: quantity (Int default 1), fulfillment_mode (enum DELIVERY | 
+COLLECTION, default DELIVERY). 
+•     Order additions: quantity (Int default 1), fulfillment_mode (enum DELIVERY | 
+COLLECTION, default DELIVERY), delivery_charge (Decimal default 0). 
+•     Order status additions: READY_FOR_COLLECTION added to the status enum. 
+COLLECTED and NOT_COLLECTED reserved for Phase 3. 
+ 
+ 
+6. UX & Design Principles 
+Brand guidelines will be provided separately. The following principles apply regardless of the 
+final visual language: 
+•     Mobile-First: All user-facing pages must be fully functional at 375px viewport width. The 
+vendor dashboard can prioritize tablet/desktop but must not break on mobile. 
+•     Progressive Disclosure: Show users only what they need at each step. Subscription 
+details, addons, and delivery preferences are revealed progressively —  not all at once. 
+•     Zero-Friction Discovery: Users must be able to browse vendor listings and menus 
+without creating an account. Account creation is required only at checkout. 
+•     Trust Signals: FSSAI badge, verified phone badge, review count, and delivery area are 
+displayed prominently on vendor cards. These are non-negotiable layout elements. 
+•     Clear Empty States: When vendors haven't published a menu, or a user has no 
+upcoming orders, show helpful empty state copy with a clear next action. 
+•     Accessibility: WCAG 2.1 AA compliance minimum. Adequate colour contrast, keyboard 
+navigation, screen reader labels. 
+ 
+ 
+7. Technical Architecture Considerations 
+7.1 Confirmed Stack 
+•     Frontend: React.js (Vite) with TailwindCSS. Separate repository from backend. Mobile-
+responsive SPA. Note: as a SPA, vendor profile pages will not be server-side rendered 
+—  SEO for public listing pages should be addressed in Phase 2 (e.g., via a lightweight 
+SSR layer or pre-rendering service). 
+•     Backend: Node.js with Express.js. RESTful API served separately from the frontend. 
+CORS configured to accept requests from the frontend domain only. 
+•     Database: MySQL hosted on Azure Database for MySQL (Flexible Server). Prisma 
+used as the ORM for type-safe queries and schema migrations. Note: MySQL does not 
+----------------Page (19) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+support native array column types —  fields like cuisine_tags, delivery_pincodes, and 
+photo_urls are stored as JSON columns. 
+•     File Storage: Azure Blob Storage for vendor photos, menu images, and FSSAI/KYC 
+documents. Private containers for sensitive documents (signed URL access); public 
+containers for food/profile photos. 
+•     Notifications: Firebase Cloud Messaging (FCM) for push notifications. Resend or 
+SendGrid for transactional email. MSG91 for SMS OTP. 
+•     Auth: Passport.js with Google OAuth 2.0 strategy and JWT (access + refresh tokens). 
+Sessions managed via signed JWTs stored in httpOnly cookies. 
+•     Background Jobs: Bull queue (backed by Redis on Azure Cache for Redis) for the 
+nightly order freeze cron job, cart expiry cleanup, notification dispatch, and wallet credit 
+processing on vendor day-off. Phase 2 will add subscription billing and payout 
+processing jobs. 
+•     Deployment: Frontend on Azure Static Web Apps. Backend on Azure App Service 
+(Node.js). Database on Azure Database for MySQL. File storage on Azure Blob Storage. 
+•     Payments: Razorpay for India —  UPI, Card, Net Banking. Razorpay Route for vendor 
+payout splits is a Phase 2 configuration pending the platform payment model decision. 
+•     reCAPTCHA: Google reCAPTCHA v3 on vendor onboarding submission, verified 
+server-side. 
+ 
+7.2 Security Requirements 
+•     All API endpoints must be authenticated via JWT middleware (except public 
+listing/browse and auth endpoints). 
+•     Vendor documents stored in private Azure Blob Storage container —  accessed only via 
+short-lived SAS (Shared Access Signature) URLs generated server-side. 
+•     PII fields (phone, bank account number, IFSC) encrypted at the application layer before 
+database write using AES-256. 
+•     All user inputs validated with express-validator or Zod on the backend. Prisma 
+parameterised queries prevent SQL injection by default. 
+•     Payment data never stored on Dabbaz servers —  tokenised via Razorpay. 
+•     CORS strictly configured: only frontend domain and admin subdomain whitelisted. 
+•     Admin API routes protected by both JWT auth and an ADMIN role middleware guard. 
+ 
+7.3 Architecture Notes 
+•     Two separate deployments: React SPA (static) and Node.js API (dynamic). Frontend 
+calls backend via a versioned base URL (e.g., api.dabbaz.in/v1/). 
+•     MySQL JSON columns (cuisine_tags, delivery_pincodes, photo_urls, tags) should be 
+queried carefully —  avoid full-table JSON scans. For filtering by pincode or cuisine, 
+maintain a normalised join table alongside the JSON column for query performance. 
+•     Menu calendar queries: index the MenuItem table on (vendor_id, date, meal_type) for 
+fast daily order lookups. 
+•     Subscription billing and payout processing must run in a Bull queue worker process, not 
+in an API route handler. 
+----------------Page (20) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+•     Delivery status polling: frontend polls GET /orders/today every 60 seconds. For Phase 2 
+consider WebSockets or Server-Sent Events to push status updates. 
+ 
+ 
+8. User Stories Summary 
+8.1 Customer Stories 
+•     As a customer, I can browse vendors and view their menus without signing up. 
+•     As a customer, I can read the How It Works page to understand Dabbaz before 
+committing. 
+•     As a customer, I can add meals to my cart from any vendor's menu without creating an 
+account. 
+•     As a customer, I can open my cart and see a calendar showing what I've added on each 
+day, with a per-vendor meal count so I know if I've met the 3-meal minimum. 
+•     As a customer, I can edit or remove meals from my cart before checking out. 
+•     As a customer, when I go to checkout I only need to enter my name, delivery address, 
+and phone number —  my account is created when I verify the OTP. 
+•     As a returning customer, I log back in by entering my phone number and verifying a new 
+OTP —  no password needed. 
+•     As a customer, I can also sign in with Google as an alternative to phone+OTP. 
+•     As a customer, I can proceed to checkout with qualifying vendors even if another vendor 
+in my cart has fewer than 3 meals —  I'll be prompted to fix or remove the shortfall before 
+paying. 
+•     As a customer, I can filter vendors by veg/non-veg, delivery area, meal type, cuisine, 
+and by availability (hide vendors at capacity). 
+•     As a customer, I can see at a glance if a vendor is at capacity and cannot accept new 
+subscribers. 
+•     As a customer, I can sign up with my email or Google account. 
+•     As a customer, I can hold active subscriptions with multiple vendors simultaneously, 
+each managed independently. 
+•     As a customer, I can view a vendor's weekly menu calendar before subscribing. 
+•     As a customer, I can purchase a trial meal from a vendor I haven't tried before. 
+•     As a customer, I can subscribe to a meal plan (minimum 4 days) and pay through the 
+platform. 
+•     As a customer, I can pause my subscription for up to 14 days without losing days. 
+•     As a customer, I can skip individual days and receive wallet credits. 
+•     As a customer, I can add addons to specific days from my subscription view. 
+•     As a customer, I can track my daily delivery status in real time. 
+•     As a customer, I can report a non-delivery and get it resolved within 24 hours. 
+•     As a customer, I can rate and review a vendor after 5+ deliveries. 
+•     As a customer, I can refer friends and earn wallet credits. 
+----------------Page (21) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+ 
+8.2 Vendor Stories 
+•     As a vendor, I can apply for onboarding by submitting business details and documents. 
+•     As a vendor, I can set a weekly menu in a calendar format for both lunch and dinner. 
+•     As a vendor, I can disable just lunch or just dinner on a specific day without marking the 
+whole day as off. 
+•     As a vendor, I can save menu templates and reuse them for future weeks. 
+•     As a vendor, I can mark specific days as fully off and notify subscribers automatically. 
+•     As a vendor, I can set a daily capacity cap to limit the number of active subscribers I 
+accept. 
+•     As a vendor, I can define subscription plans with custom durations (min 4 days) and 
+pricing. 
+•     As a vendor, I can define addons and make them available on specific days. 
+•     As a vendor, I can view all my active subscribers and their delivery preferences. 
+•     As a vendor, I can update delivery status per order each day. 
+•     As a vendor, I can view my earnings, pending payouts, and download reports. 
+•     As a vendor, I can respond to customer reviews publicly. 
+•     As a vendor, I can temporarily pause new subscriptions when I need a break. 
+ 
+8.3 Admin Stories 
+•     As an admin, I can review and approve/reject vendor onboarding applications. 
+•     As an admin, I can view platform-wide metrics on a single dashboard. 
+•     As an admin, I can manage users and issue wallet credits or bans. 
+•     As an admin, I can adjudicate delivery disputes and issue resolutions. 
+•     As an admin, I can approve and process vendor payout batches. 
+•     As an admin, I can moderate reviews and manage flagged content. 
+•     As an admin, I can configure global platform settings (commission, cutoffs, etc.). 
+ 
+ 
+9. Phased Roadmap 
+Phase              Timeline                                Scope 
+MVP                Month 1–3                              Phone+OTP Auth, Vendor Onboarding (full form + 
+manual admin creation), Vendor Menu Builder (per -
+day per-meal-type pricing), Public Discovery with 
+pincode filter, Vendor Profile + Menu Calendar, Cart 
+(multi-vendor, min-3 rule, calendar view), Checkout 
+with account creation, Razorpay payment, Wallet (with 
+top-up toggle + cancellation credits), Day -level order 
+----------------Page (22) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+cancellation with 9 PM freeze, Vendor dispatch 
+notification (WhatsApp + email), Admin dashboard 
+(vendor queue, user management, order lookup, 
+platform config), How It Works page. 
+Phase 2           Month 4–6                              Subscription plans (recurring, pause/skip/cancel, auto -
+renewal), Ratings & Reviews, Dispute resolution 
+module, Vendor payout dashboard, WhatsApp 
+notifications to vendors, Consolidated order count by 
+area, Individual vendor order cancellation, PDF 
+invoice generation, Referral system, Trial meals, Meal 
+preference profiles. 
+Phase 3           Month 7–9                              Native iOS & Android apps, Multi-city expansion, 
+Delivery partner module, AI-powered 
+recommendations, Vernacular language support, 
+Loyalty programme. 
+Phase 4           Month 10+                              Vendor analytics deep-dive, Corporate/office tiffin 
+packages, API for third-party integrations, Aggregator 
+partnerships. 
+ 
+ 
+10. Open Questions & Decisions Pending 
+•     OQ-1 Brand & Design: Brand guidelines to be provided. All color tokens, typography, 
+and icon sets are placeholders pending brand handoff. 
+•     OQ-2 Payment Model (Critical): Whether Dabbaz aggregates payments (platform 
+collects from customer, distributes to vendors) or facilitates direct payments (customer 
+pays vendor directly) has significant legal and operational implications —  payment 
+aggregator licence, GST liability, TDS on vendor payouts. Decision pending a separate 
+business/legal review. Current implementation assumes platform-collected payments. 
+•     OQ-3 WhatsApp Provider: Interakt or Wati recommended for WhatsApp Business API 
+integration. Pre-approved message templates must be submitted to Meta before launch. 
+Typical approval: 24–48 hours. Set this up early —  do not leave it for launch week. 
+•     OQ-4 KYC Depth: Is FSSAI + Government ID sufficient for vendor verification, or do we 
+require a live selfie/video step for higher trust? FSSAI + Govt ID is the MVP default. 
+•     OQ-5 Vendor Onboarding Fee: Optional INR 99–499 refundable application fee as a 
+spam deterrent. Decision pending. 
+•     OQ-6 GST Compliance: Vendors below the GST registration threshold (INR 20L annual 
+turnover) are exempt. Platform-level GST handling and invoice requirements need legal 
+review before launch. GST module is Phase 2 in the build but legal clarity is needed 
+before MVP goes live. 
+•     OQ-7 Cart Expiry Notification: When a cart item expires after 7 days, should the 
+customer receive an email/WhatsApp notification? Recommended: yes, but requires the 
+customer to have a phone number on file —  only possible if they are already registered. 
+•     OQ-8 Delivery Freeze Edge Case: If a vendor marks a day as Off after 9 PM (e.g., 
+emergency the night before), the system should still process the vendor cancellation and 
+----------------Page (23) Break----------------
+Dabbaz  | Product Requirements Document 
+Confidential  |  v1.4  |  Feb 2026                                                                                                                         Page 
+ 
+issue wallet credits. However the customer cannot cancel their own order after 9 PM. Is 
+this asymmetry acceptable? Recommended: yes —  vendor emergencies override the 
+freeze, customer cancellations do not. 
+ 
+ 
+DABBAZ — Product Requirements Document v1.4 
+Confidential — Internal Use Only 
+----------------Page (24) Break----------------

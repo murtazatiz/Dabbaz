@@ -145,7 +145,7 @@ export const sendOtp = async (req: Request, res: Response) => {
 export const verifyOtp = async (req: Request, res: Response) => {
     try {
         const { phone, otp } = req.body;
-        const user = req.user!;
+        const user = req.user as any;
 
         // Verify OTP logic (mocking success)
         if (otp !== '123456') { // Mock check

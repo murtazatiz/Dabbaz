@@ -9,20 +9,20 @@ datasource db {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
-  email          String    @unique
+  id             Int      @id @default(autoincrement())
+  email          String   @unique
   name           String
-  phone          String?   @unique
-  phone_verified Boolean   @default(false)
+  phone          String?  @unique
+  phone_verified Boolean  @default(false)
   avatar_url     String?
-  role           String    // "CUSTOMER", "VENDOR", "ADMIN"
-  wallet_balance Decimal   @default(0)
-  referral_code  String    @unique
+  role           String // "CUSTOMER", "VENDOR", "ADMIN"
+  wallet_balance Decimal  @default(0)
+  referral_code  String   @unique
   referred_by_id Int?
-  referred_by    User?     @relation("Referrals", fields: [referred_by_id], references: [id])
-  referrals      User[]    @relation("Referrals")
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  referred_by    User?    @relation("Referrals", fields: [referred_by_id], references: [id])
+  referrals      User[]   @relation("Referrals")
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   VendorProfile           VendorProfile?
   VendorOnboardingRequest VendorOnboardingRequest[]
@@ -34,37 +34,47 @@ model User {
   Review                  Review[]
   Notification            Notification[]
   RefreshToken            RefreshToken[]
+  CartItem                CartItem[]
+  Invoice                 Invoice[]
 }
 
 model VendorProfile {
-  id                      Int       @id @default(autoincrement())
-  user_id                 Int       @unique
-  user                    User      @relation(fields: [user_id], references: [id])
-  business_name           String
-  slug                    String    @unique
-  about                   String
-  fssai_number            String
-  fssai_doc_url           String
-  govt_id_url             String
-  is_verified             Boolean   @default(false)
-  is_active               Boolean   @default(true)
-  cuisine_tags            String    // SQLite doesn't have JSON array, map to stringified JSON in code
-  food_type               String    // "VEG", "NONVEG", "BOTH"
-  lunch_window_start      String?
-  lunch_window_end        String?
-  dinner_window_start     String?
-  dinner_window_end       String?
-  delivery_pincodes       String    // SQLite doesn't have JSON array, map to stringified JSON in code
-  cover_photo_url         String
-  photo_urls              String    // SQLite doesn't have JSON array
-  commission_rate         Decimal   @default(0.12)
-  daily_capacity          Int       @default(999)
-  active_subscriber_count Int       @default(0)
-  bank_account_name       String
-  bank_account_number     String
-  bank_ifsc               String
-  created_at              DateTime  @default(now())
-  updated_at              DateTime  @updatedAt
+  id                             Int      @id @default(autoincrement())
+  user_id                        Int      @unique
+  user                           User     @relation(fields: [user_id], references: [id])
+  business_name                  String
+  slug                           String   @unique
+  about                          String
+  fssai_number                   String
+  fssai_doc_url                  String
+  govt_id_url                    String
+  is_verified                    Boolean  @default(false)
+  is_active                      Boolean  @default(true)
+  cuisine_tags                   String // SQLite doesn't have JSON array, map to stringified JSON in code
+  food_type                      String // "VEG", "NONVEG", "BOTH"
+  lunch_window_start             String?
+  lunch_window_end               String?
+  dinner_window_start            String?
+  dinner_window_end              String?
+  delivery_pincodes              String // SQLite doesn't have JSON array, map to stringified JSON in code
+  cover_photo_url                String
+  photo_urls                     String // SQLite doesn't have JSON array
+  commission_rate                Decimal  @default(0.12)
+  daily_capacity                 Int      @default(999)
+  active_subscriber_count        Int      @default(0)
+  bank_account_name              String
+  bank_account_number            String
+  bank_ifsc                      String
+  delivery_charge                Decimal?
+  collection_enabled             Boolean  @default(false)
+  collection_address_lunch       String?
+  collection_address_dinner      String?
+  collection_lunch_window_start  String?
+  collection_lunch_window_end    String?
+  collection_dinner_window_start String?
+  collection_dinner_window_end   String?
+  created_at                     DateTime @default(now())
+  updated_at                     DateTime @updatedAt
 
   SubscriptionPlan SubscriptionPlan[]
   MenuItem         MenuItem[]
@@ -74,13 +84,14 @@ model VendorProfile {
   Dispute          Dispute[]
   VendorPayout     VendorPayout[]
   Review           Review[]
+  CartItem         CartItem[]
 }
 
 model VendorOnboardingRequest {
   id                 Int      @id @default(autoincrement())
   user_id            Int
   user               User     @relation(fields: [user_id], references: [id])
-  status             String   // "PENDING", "APPROVED", "REJECTED", "NEEDS_MORE_INFO"
+  status             String // "PENDING", "APPROVED", "REJECTED", "NEEDS_MORE_INFO"
   business_name      String
   contact_name       String
   address            String
@@ -105,8 +116,8 @@ model SubscriptionPlan {
   name                 String
   description          String
   duration_days        Int
-  meal_type            String        // "LUNCH", "DINNER", "BOTH"
-  food_type            String        // "VEG", "NONVEG", "BOTH"
+  meal_type            String // "LUNCH", "DINNER", "BOTH"
+  food_type            String // "VEG", "NONVEG", "BOTH"
   price                Decimal
   is_active            Boolean       @default(true)
   auto_renewal_default Boolean       @default(true)
@@ -121,18 +132,24 @@ model MenuItem {
   vendor_id        Int
   vendor           VendorProfile @relation(fields: [vendor_id], references: [id])
   date             DateTime
-  meal_type        String        // "LUNCH", "DINNER"
+  meal_type        String // "LUNCH", "DINNER"
   name             String
   description      String?
-  food_type        String        // "VEG", "NONVEG"
+  food_type        String // "VEG", "NONVEG"
   photo_url        String?
   is_off_day       Boolean       @default(false)
   is_slot_disabled Boolean       @default(false)
   is_published     Boolean       @default(false)
+  fulfilment_types String        @default("DELIVERY") // "DELIVERY", "COLLECTION", "BOTH"
+  max_orders       Int?
+  max_portions     Int?
+  current_orders   Int           @default(0)
+  current_portions Int           @default(0)
   created_at       DateTime      @default(now())
   updated_at       DateTime      @updatedAt
 
   MenuItemAddon MenuItemAddon[]
+  CartItem      CartItem[]
 
   @@unique([vendor_id, date, meal_type])
 }
@@ -143,7 +160,7 @@ model Addon {
   vendor     VendorProfile @relation(fields: [vendor_id], references: [id])
   name       String
   price      Decimal
-  food_type  String        // "VEG", "NONVEG"
+  food_type  String // "VEG", "NONVEG"
   is_active  Boolean       @default(true)
   created_at DateTime      @default(now())
 
@@ -169,7 +186,7 @@ model Subscription {
   plan               SubscriptionPlan @relation(fields: [plan_id], references: [id])
   vendor_id          Int
   vendor             VendorProfile    @relation(fields: [vendor_id], references: [id])
-  status             String           // "ACTIVE", "PAUSED", "CANCELLED", "EXPIRED"
+  status             String // "ACTIVE", "PAUSED", "CANCELLED", "EXPIRED"
   start_date         DateTime
   end_date           DateTime
   auto_renewal       Boolean          @default(true)
@@ -184,19 +201,22 @@ model Subscription {
 }
 
 model Order {
-  id              Int            @id @default(autoincrement())
-  subscription_id Int?
-  subscription    Subscription?  @relation(fields: [subscription_id], references: [id])
-  user_id         Int
-  user            User           @relation(fields: [user_id], references: [id])
-  vendor_id       Int
-  vendor          VendorProfile  @relation(fields: [vendor_id], references: [id])
-  delivery_date   DateTime
-  meal_type       String         // "LUNCH", "DINNER"
-  status          String         // "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED", "NOT_DELIVERED"
-  is_trial        Boolean        @default(false)
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
+  id               Int           @id @default(autoincrement())
+  subscription_id  Int?
+  subscription     Subscription? @relation(fields: [subscription_id], references: [id])
+  user_id          Int
+  user             User          @relation(fields: [user_id], references: [id])
+  vendor_id        Int
+  vendor           VendorProfile @relation(fields: [vendor_id], references: [id])
+  delivery_date    DateTime
+  meal_type        String // "LUNCH", "DINNER"
+  status           String // "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED", "NOT_DELIVERED", "READY_FOR_COLLECTION", "COLLECTED", "NOT_COLLECTED"
+  is_trial         Boolean       @default(false)
+  quantity         Int           @default(1)
+  fulfillment_mode String        @default("DELIVERY")
+  delivery_charge  Decimal       @default(0)
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
 
   OrderAddon OrderAddon[]
   Dispute    Dispute[]
@@ -212,17 +232,17 @@ model OrderAddon {
 }
 
 model Payment {
-  id                  Int     @id @default(autoincrement())
+  id                  Int      @id @default(autoincrement())
   user_id             Int
-  user                User    @relation(fields: [user_id], references: [id])
+  user                User     @relation(fields: [user_id], references: [id])
   order_id            Int?
   subscription_id     Int?
-  razorpay_order_id   String  @unique
+  razorpay_order_id   String   @unique
   razorpay_payment_id String?
   amount              Decimal
   platform_fee        Decimal
   vendor_payout       Decimal
-  status              String  // "PENDING", "SUCCESS", "FAILED", "REFUNDED"
+  status              String // "PENDING", "SUCCESS", "FAILED", "REFUNDED"
   created_at          DateTime @default(now())
 }
 
@@ -234,10 +254,10 @@ model Dispute {
   order            Order         @relation(fields: [order_id], references: [id])
   vendor_id        Int
   vendor           VendorProfile @relation(fields: [vendor_id], references: [id])
-  type             String        // "NON_DELIVERY", "WRONG_ITEM", "QUALITY", "OVERCHARGE"
+  type             String // "NON_DELIVERY", "WRONG_ITEM", "QUALITY", "OVERCHARGE"
   description      String
   photo_url        String?
-  status           String        // "OPEN", "VENDOR_RESPONDED", "RESOLVED", "DISMISSED"
+  status           String // "OPEN", "VENDOR_RESPONDED", "RESOLVED", "DISMISSED"
   vendor_response  String?
   admin_resolution String?
   credit_issued    Decimal?
@@ -250,23 +270,23 @@ model WalletTransaction {
   user_id      Int
   user         User     @relation(fields: [user_id], references: [id])
   amount       Decimal
-  type         String   // "CREDIT", "DEBIT"
+  type         String // "CREDIT", "DEBIT"
   reason       String
   reference_id String?
   created_at   DateTime @default(now())
 }
 
 model VendorPayout {
-  id            Int           @id @default(autoincrement())
-  vendor_id     Int
-  vendor        VendorProfile @relation(fields: [vendor_id], references: [id])
-  amount        Decimal
-  status        String        // "PENDING", "PROCESSED", "FAILED"
-  period_start  DateTime
-  period_end    DateTime
-  processed_at  DateTime?
-  utr_number    String?
-  created_at    DateTime      @default(now())
+  id           Int           @id @default(autoincrement())
+  vendor_id    Int
+  vendor       VendorProfile @relation(fields: [vendor_id], references: [id])
+  amount       Decimal
+  status       String // "PENDING", "PROCESSED", "FAILED"
+  period_start DateTime
+  period_end   DateTime
+  processed_at DateTime?
+  utr_number   String?
+  created_at   DateTime      @default(now())
 }
 
 model Review {
@@ -277,7 +297,7 @@ model Review {
   vendor          VendorProfile @relation(fields: [vendor_id], references: [id])
   rating          Int
   comment         String
-  tags            String        // SQLite doesn't have JSON array
+  tags            String // SQLite doesn't have JSON array
   photo_url       String?
   vendor_response String?
   is_flagged      Boolean       @default(false)
@@ -296,7 +316,7 @@ model Notification {
   body       String
   type       String
   is_read    Boolean  @default(false)
-  meta       String?  // SQLite doesn't have JSON
+  meta       String? // SQLite doesn't have JSON
   created_at DateTime @default(now())
 }
 
@@ -307,4 +327,64 @@ model RefreshToken {
   token      String   @unique
   expires_at DateTime
   created_at DateTime @default(now())
+}
+
+model CartItem {
+  id               Int           @id @default(autoincrement())
+  user_id          Int?
+  user             User?         @relation(fields: [user_id], references: [id])
+  session_id       String?
+  vendor_id        Int
+  vendor           VendorProfile @relation(fields: [vendor_id], references: [id])
+  menu_item_id     Int
+  menu_item        MenuItem      @relation(fields: [menu_item_id], references: [id])
+  meal_type        String // "LUNCH", "DINNER"
+  delivery_date    DateTime
+  addons           String // SQLite doesn't have JSON array
+  quantity         Int           @default(1)
+  fulfillment_mode String        @default("DELIVERY")
+  expires_at       DateTime
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+}
+
+model Invoice {
+  id               Int       @id @default(autoincrement())
+  user_id          Int
+  user             User      @relation(fields: [user_id], references: [id])
+  invoice_number   String    @unique
+  type             String // "PER_TRANSACTION", "MONTHLY_STATEMENT", "VENDOR_SETTLEMENT"
+  period_start     DateTime?
+  period_end       DateTime?
+  subtotal         Decimal
+  taxable_value    Decimal
+  cgst             Decimal
+  sgst             Decimal
+  total_gst        Decimal
+  total_amount     Decimal
+  pdf_url          String?
+  email_sent_at    DateTime?
+  payment_id       Int?
+  vendor_payout_id Int?
+  created_at       DateTime  @default(now())
+}
+
+model GSTRate {
+  id                 Int      @id @default(autoincrement())
+  name               String
+  rate               Decimal
+  taxable_percentage Decimal
+  sac_code           String
+  is_active          Boolean  @default(true)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+}
+
+model PlatformSettings {
+  id                   Int      @id @default(1)
+  wallet_topup_enabled Boolean  @default(true)
+  cancellation_fee     Decimal  @default(20)
+  order_freeze_hour    Int      @default(21)
+  whatsapp_enabled     Boolean  @default(true)
+  updated_at           DateTime @updatedAt
 }

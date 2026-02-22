@@ -14,3 +14,15 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
         next();
     })(req, res, next);
 };
+
+export const optionalAuth = (req: Request, res: Response, next: NextFunction) => {
+    passport.authenticate('jwt', { session: false }, (err: any, user: User | false, info: any) => {
+        if (err) {
+            return next(err);
+        }
+        if (user) {
+            req.user = user;
+        }
+        next();
+    })(req, res, next);
+};

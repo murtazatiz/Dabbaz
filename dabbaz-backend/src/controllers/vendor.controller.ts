@@ -99,7 +99,15 @@ export const updateProfile = async (req: Request, res: Response) => {
             dinner_window_end,
             bank_account_name,
             bank_account_number,
-            bank_ifsc
+            bank_ifsc,
+            delivery_charge,
+            collection_enabled,
+            collection_address_lunch,
+            collection_address_dinner,
+            collection_lunch_window_start,
+            collection_lunch_window_end,
+            collection_dinner_window_start,
+            collection_dinner_window_end
         } = req.body;
 
         const profile = await prisma.vendorProfile.update({
@@ -117,7 +125,15 @@ export const updateProfile = async (req: Request, res: Response) => {
                 dinner_window_end,
                 bank_account_name,
                 bank_account_number,
-                bank_ifsc
+                bank_ifsc,
+                delivery_charge: delivery_charge ? Number(delivery_charge) : null,
+                collection_enabled: Boolean(collection_enabled),
+                collection_address_lunch,
+                collection_address_dinner,
+                collection_lunch_window_start,
+                collection_lunch_window_end,
+                collection_dinner_window_start,
+                collection_dinner_window_end
             }
         });
 
