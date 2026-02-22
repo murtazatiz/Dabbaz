@@ -178,7 +178,59 @@ export default function HomePage() {
                             </div>
                         )}
                     </div>
+                </div>
 
+                {/* How It Works Section */}
+                <div className="bg-white py-16 sm:py-24">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-extrabold text-gray-900">How Dabbaz Works</h2>
+                            <p className="mt-4 text-lg text-gray-500">Simple, fresh, and delivered straight to you.</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                            <div className="text-center">
+                                <div className="bg-green-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3">
+                                    <span className="text-2xl font-bold text-green-600">1</span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">Find a Chef</h3>
+                                <p className="text-gray-500">Browse verified local home chefs in your area offering authentic regional cuisines.</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="bg-yellow-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 -rotate-3">
+                                    <span className="text-2xl font-bold text-yellow-600">2</span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">Choose a Plan</h3>
+                                <p className="text-gray-500">Select a weekly or monthly subscription that fits your schedule and dietary needs.</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="bg-green-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6 rotate-3">
+                                    <span className="text-2xl font-bold text-green-600">3</span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-3">Enjoy Daily Meals</h3>
+                                <p className="text-gray-500">Get fresh, hot meals delivered to your door every day, just like home.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* CTA Section */}
+                <div className="bg-green-600 py-16">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between">
+                        <div className="text-center md:text-left mb-8 md:mb-0">
+                            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+                                <span className="block">Are you a great cook?</span>
+                                <span className="block text-green-200">Turn your passion into a business.</span>
+                            </h2>
+                            <p className="mt-4 text-lg leading-6 text-green-100 max-w-xl">
+                                Join our community of verified home chefs. Manage subscriptions, get weekly payouts, and grow your customer base with zero hassle.
+                            </p>
+                        </div>
+                        <div className="flex gap-4">
+                            <Link to="/become-a-chef" className="bg-yellow-400 text-yellow-900 font-bold px-8 py-4 rounded-xl shadow-lg hover:bg-yellow-300 transition-colors">
+                                Become a Chef
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
