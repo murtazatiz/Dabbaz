@@ -3,9 +3,9 @@ import Navbar from './Navbar';
 
 export default function Layout() {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen flex flex-col">
             <Navbar />
-            <main>
+            <main className="flex-1">
                 <Outlet />
             </main>
         </div>
