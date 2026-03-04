@@ -27,7 +27,7 @@ export default function BecomeVendorPage() {
     const [declaration, setDeclaration] = useState(false);
     const [businessData, setBusinessData] = useState<BusinessFormValues | null>(null);
 
-    const { register: registerBusiness, handleSubmit: handleSubmitBusiness, formState: { errors: businessErrors } } = useForm<BusinessFormValues>({
+    const { register: registerBusiness, handleSubmit: handleSubmitBusiness, formState: { errors: businessErrors } } = useForm<any>({
         resolver: zodResolver(businessSchema),
     });
 
@@ -50,7 +50,7 @@ export default function BecomeVendorPage() {
         }
     };
 
-    const onBusinessSubmit = (data: BusinessFormValues) => {
+    const onBusinessSubmit = (data: any) => {
         setBusinessData(data);
         setStep(3);
     };
@@ -93,139 +93,150 @@ export default function BecomeVendorPage() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Become a Dabbaz Vendor</h1>
-                <p className="mt-2 text-gray-600">Join our marketplace and deliver home-cooked meals.</p>
-            </div>
+        <div className="bg-brand-base min-h-screen">
+            <div className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+                <div className="mb-10 text-center">
+                    <h1 className="text-4xl font-extrabold text-text-primary mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>Become a Dabbaz Vendor</h1>
+                    <p className="text-lg text-text-secondary font-medium">Join our marketplace and deliver home-cooked meals.</p>
+                </div>
 
-            {/* Progress Bar */}
-            <div className="flex justify-between mb-8">
-                {[1, 2, 3, 4].map(s => (
-                    <div key={s} className="flex-1 text-center">
-                        <div className={`h-2 rounded-full mx-1 ${step >= s ? 'bg-green-600' : 'bg-gray-200'}`} />
-                        <span className={`text-xs mt-2 block ${step >= s ? 'text-green-600 font-medium' : 'text-gray-400'}`}>Step {s}</span>
-                    </div>
-                ))}
-            </div>
+                {/* Progress Bar */}
+                <div className="flex justify-between mb-8">
+                    {[1, 2, 3, 4].map(s => (
+                        <div key={s} className="flex-1 text-center">
+                            <div className={`h-2.5 rounded-full mx-2 shadow-inner inset-shadow-sm ${step >= s ? 'bg-success' : 'bg-brand-primary/10'}`} />
+                            <span className={`text-sm mt-3 block font-bold ${step >= s ? 'text-success' : 'text-text-secondary'}`}>Step {s}</span>
+                        </div>
+                    ))}
+                </div>
 
-            <div className="bg-white shadow rounded-lg p-6">
-                {step === 1 && (
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-medium">Verify Phone Number</h2>
-                        <input
-                            type="text"
-                            placeholder="10 digit mobile number"
-                            className="w-full border rounded p-2"
-                            value={phone}
-                            onChange={e => setPhone(e.target.value)}
-                        />
-                        <button onClick={handleSendOtp} className="bg-gray-100 px-4 py-2 rounded">Send OTP</button>
-
-                        <div className="mt-4">
-                            <input
-                                type="text"
-                                placeholder="6 digit OTP"
-                                className="w-full border rounded p-2"
-                                value={otp}
-                                onChange={e => setOtp(e.target.value)}
-                            />
-                            <button onClick={handleVerifyOtp} className="mt-2 bg-green-600 text-white px-4 py-2 rounded">Verify</button>
-                        </div>
-                    </div>
-                )}
-
-                {step === 2 && (
-                    <form onSubmit={handleSubmitBusiness(onBusinessSubmit)} className="space-y-4">
-                        <h2 className="text-xl font-medium">Business Details</h2>
-                        <div>
-                            <label className="block text-sm">Business/Kitchen Name</label>
-                            <input {...registerBusiness('business_name')} className="w-full border rounded p-2" />
-                            {businessErrors.business_name && <p className="text-red-500 text-xs">{businessErrors.business_name.message}</p>}
-                        </div>
-                        <div>
-                            <label className="block text-sm">Contact Person</label>
-                            <input {...registerBusiness('contact_name')} className="w-full border rounded p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm">Full Address</label>
-                            <input {...registerBusiness('address')} className="w-full border rounded p-2" />
-                        </div>
-                        <div>
-                            <label className="block text-sm">PIN Code</label>
-                            <input {...registerBusiness('pincode')} className="w-full border rounded p-2" />
-                        </div>
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <label className="block text-sm">Years of Operation</label>
-                                <input type="number" {...registerBusiness('years_of_operation')} className="w-full border rounded p-2" />
+                <div className="card-neumorphic">
+                    {step === 1 && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold text-text-primary mb-2 border-b border-brand-primary/10 pb-3" style={{ fontFamily: "'Playfair Display', serif" }}>Verify Phone Number</h2>
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder="10 digit mobile number"
+                                    className="input-neumorphic w-full mb-4"
+                                    value={phone}
+                                    onChange={e => setPhone(e.target.value)}
+                                />
+                                <button onClick={handleSendOtp} className="btn-skeuo px-6 py-2 w-full md:w-auto">Send OTP</button>
                             </div>
-                            <div className="flex-1">
-                                <label className="block text-sm">Daily Capacity (Tiffins)</label>
-                                <input type="number" {...registerBusiness('daily_capacity')} className="w-full border rounded p-2" />
+
+                            <div className="mt-6 pt-6 border-t border-brand-primary/10">
+                                <input
+                                    type="text"
+                                    placeholder="6 digit OTP"
+                                    className="input-neumorphic w-full mb-4"
+                                    value={otp}
+                                    onChange={e => setOtp(e.target.value)}
+                                />
+                                <button onClick={handleVerifyOtp} className="btn-skeuo-primary px-6 py-2 w-full md:w-auto">Verify</button>
                             </div>
                         </div>
-                        <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">Next</button>
-                    </form>
-                )}
+                    )}
 
-                {step === 3 && (
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-medium">Document Upload</h2>
-                        <div>
-                            <label className="block text-sm font-medium">FSSAI License (PDF/JPG)</label>
-                            <input type="file" onChange={e => handleFileUpload(e, setFssaiUrl)} className="mt-1" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium">Government ID (Proprietor)</label>
-                            <input type="file" onChange={e => handleFileUpload(e, setGovtIdUrl)} className="mt-1" />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-500">Hygiene Certificate (Optional)</label>
-                            <input type="file" onChange={e => handleFileUpload(e, setHygieneUrl)} className="mt-1" />
-                        </div>
-                        <button
-                            onClick={() => {
-                                if (!fssaiUrl || !govtIdUrl) return alert("FSSAI and ID are required");
-                                setStep(4);
-                            }}
-                            className="bg-green-600 text-white px-4 py-2 rounded mt-4"
-                        >
-                            Next
-                        </button>
-                    </div>
-                )}
+                    {step === 2 && (
+                        <form onSubmit={handleSubmitBusiness(onBusinessSubmit)} className="space-y-5">
+                            <h2 className="text-2xl font-bold text-text-primary mb-2 border-b border-brand-primary/10 pb-3" style={{ fontFamily: "'Playfair Display', serif" }}>Business Details</h2>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">Business/Kitchen Name</label>
+                                <input {...registerBusiness('business_name')} className="input-neumorphic w-full" />
+                                {businessErrors.business_name && <p className="text-error text-xs font-bold mt-1">{businessErrors.business_name?.message?.toString()}</p>}
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">Contact Person</label>
+                                <input {...registerBusiness('contact_name')} className="input-neumorphic w-full" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">Full Address</label>
+                                <input {...registerBusiness('address')} className="input-neumorphic w-full" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">PIN Code</label>
+                                <input {...registerBusiness('pincode')} className="input-neumorphic w-full" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-bold text-text-secondary mb-2">Years of Operation</label>
+                                    <input type="number" {...registerBusiness('years_of_operation')} className="input-neumorphic w-full" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-text-secondary mb-2">Daily Capacity (Tiffins)</label>
+                                    <input type="number" {...registerBusiness('daily_capacity')} className="input-neumorphic w-full" />
+                                </div>
+                            </div>
+                            <div className="pt-4 border-t border-brand-primary/10 flex justify-end">
+                                <button type="submit" className="btn-skeuo-primary px-8 py-3 w-full md:w-auto">Next</button>
+                            </div>
+                        </form>
+                    )}
 
-                {step === 4 && (
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-medium">Sample Menu & Final Submit</h2>
-                        <div>
-                            <label className="block text-sm">Describe typical meals you offer (Min 100 chars)</label>
-                            <textarea
-                                className="w-full border rounded p-2 h-32"
-                                value={sampleMenu}
-                                onChange={e => setSampleMenu(e.target.value)}
-                            />
+                    {step === 3 && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold text-text-primary mb-2 border-b border-brand-primary/10 pb-3" style={{ fontFamily: "'Playfair Display', serif" }}>Document Upload</h2>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">FSSAI License (PDF/JPG)</label>
+                                <input type="file" onChange={e => handleFileUpload(e, setFssaiUrl)} className="input-neumorphic w-full cursor-pointer bg-white" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">Government ID (Proprietor)</label>
+                                <input type="file" onChange={e => handleFileUpload(e, setGovtIdUrl)} className="input-neumorphic w-full cursor-pointer bg-white" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">Hygiene Certificate (Optional)</label>
+                                <input type="file" onChange={e => handleFileUpload(e, setHygieneUrl)} className="input-neumorphic w-full cursor-pointer bg-white" />
+                            </div>
+                            <div className="pt-4 border-t border-brand-primary/10 flex justify-end">
+                                <button
+                                    onClick={() => {
+                                        if (!fssaiUrl || !govtIdUrl) return alert("FSSAI and ID are required");
+                                        setStep(4);
+                                    }}
+                                    className="btn-skeuo-primary px-8 py-3 w-full md:w-auto"
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
+                    )}
 
-                        <div className="flex items-center gap-2">
-                            <input
-                                type="checkbox"
-                                id="declare"
-                                checked={declaration}
-                                onChange={e => setDeclaration(e.target.checked)}
-                            />
-                            <label htmlFor="declare" className="text-sm">I confirm all information provided is accurate and true.</label>
+                    {step === 4 && (
+                        <div className="space-y-6">
+                            <h2 className="text-2xl font-bold text-text-primary mb-2 border-b border-brand-primary/10 pb-3" style={{ fontFamily: "'Playfair Display', serif" }}>Sample Menu & Final Submit</h2>
+                            <div>
+                                <label className="block text-sm font-bold text-text-secondary mb-2">Describe typical meals you offer (Min 100 chars)</label>
+                                <textarea
+                                    className="input-neumorphic w-full h-32"
+                                    value={sampleMenu}
+                                    onChange={e => setSampleMenu(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-3 p-4 bg-brand-primary/5 rounded-xl border border-brand-primary/10">
+                                <input
+                                    type="checkbox"
+                                    id="declare"
+                                    checked={declaration}
+                                    onChange={e => setDeclaration(e.target.checked)}
+                                    className="w-5 h-5 skeuo-radio text-brand-primary"
+                                />
+                                <label htmlFor="declare" className="text-sm font-bold text-text-primary cursor-pointer">I confirm all information provided is accurate and true.</label>
+                            </div>
+
+                            <div className="pt-4 border-t border-brand-primary/10">
+                                <button
+                                    onClick={submitApplication}
+                                    className="btn-skeuo-primary px-8 py-3 w-full text-lg"
+                                >
+                                    Submit Application
+                                </button>
+                            </div>
                         </div>
-
-                        <button
-                            onClick={submitApplication}
-                            className="bg-green-600 text-white px-6 py-2 rounded w-full font-medium"
-                        >
-                            Submit Application
-                        </button>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

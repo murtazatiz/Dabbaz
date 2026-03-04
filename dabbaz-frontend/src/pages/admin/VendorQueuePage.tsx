@@ -50,39 +50,41 @@ export default function VendorQueuePage() {
     };
 
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-bold mb-6">Pending Vendor Approvals</h1>
-            <div className="bg-white rounded shadow overflow-hidden">
-                <table className="min-w-full divide-y border">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-sm font-medium">Business</th>
-                            <th className="px-6 py-3 text-left text-sm font-medium">Contact</th>
-                            <th className="px-6 py-3 text-left text-sm font-medium">PIN</th>
-                            <th className="px-6 py-3 text-left text-sm font-medium">Docs</th>
-                            <th className="px-6 py-3 text-left text-sm font-medium">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                        {requests.map(req => (
-                            <tr key={req.id}>
-                                <td className="px-6 py-4">{req.business_name}</td>
-                                <td className="px-6 py-4">{req.contact_name}</td>
-                                <td className="px-6 py-4">{req.pincode}</td>
-                                <td className="px-6 py-4">
-                                    <a href={req.fssai_doc_url} target="_blank" rel="noreferrer" className="text-blue-500 underline">FSSAI</a>
-                                </td>
-                                <td className="px-6 py-4 flex gap-2">
-                                    <button onClick={() => handleApprove(req.id)} className="bg-green-500 text-white px-3 py-1 rounded text-sm">Approve</button>
-                                    <button onClick={() => handleReject(req.id)} className="bg-red-500 text-white px-3 py-1 rounded text-sm">Reject</button>
-                                </td>
+        <div className="bg-brand-base min-h-screen">
+            <div className="max-w-6xl mx-auto py-8 px-4">
+                <h1 className="text-3xl font-extrabold mb-8 text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>Pending Vendor Approvals</h1>
+                <div className="card-neumorphic overflow-hidden p-0 mb-8">
+                    <table className="min-w-full divide-y divide-brand-primary/10">
+                        <thead className="bg-brand-primary/5">
+                            <tr>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Business</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Contact</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">PIN</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Docs</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Actions</th>
                             </tr>
-                        ))}
-                        {requests.length === 0 && (
-                            <tr><td colSpan={5} className="px-6 py-4 text-center">No pending requests</td></tr>
-                        )}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-brand-primary/10 bg-transparent">
+                            {requests.map(req => (
+                                <tr key={req.id} className="hover:bg-brand-primary/5 transition-colors">
+                                    <td className="px-6 py-4 font-bold text-text-primary">{req.business_name}</td>
+                                    <td className="px-6 py-4 font-medium text-text-secondary">{req.contact_name}</td>
+                                    <td className="px-6 py-4 font-medium text-text-secondary">{req.pincode}</td>
+                                    <td className="px-6 py-4">
+                                        <a href={req.fssai_doc_url} target="_blank" rel="noreferrer" className="font-bold text-brand-primary hover:text-brand-secondary transition-colors underline">FSSAI</a>
+                                    </td>
+                                    <td className="px-6 py-4 flex gap-3">
+                                        <button onClick={() => handleApprove(req.id)} className="btn-skeuo-primary px-4 py-2 text-sm border-transparent hover:bg-success hover:text-white transition-colors border">Approve</button>
+                                        <button onClick={() => handleReject(req.id)} className="btn-skeuo px-4 py-2 text-sm border-error text-error hover:bg-error/10 transition-colors">Reject</button>
+                                    </td>
+                                </tr>
+                            ))}
+                            {requests.length === 0 && (
+                                <tr><td colSpan={5} className="px-6 py-8 text-center text-text-secondary font-medium">No pending requests</td></tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

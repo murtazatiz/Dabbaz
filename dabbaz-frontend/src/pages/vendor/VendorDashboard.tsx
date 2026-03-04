@@ -36,87 +36,89 @@ export default function VendorDashboard() {
     if (!stats) return <div className="max-w-6xl mx-auto py-8 px-4"><p className="text-gray-500">Could not load dashboard data. Are you an approved Chef?</p></div>;
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Chef Dashboard</h1>
-                <div className="flex gap-4">
-                    <Link to="/vendor-menu" className="bg-green-600 text-white px-4 py-2 rounded font-medium hover:bg-green-700">Manage Menu</Link>
-                    <Link to="/vendor-plans" className="bg-white border text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-50">Manage Plans</Link>
-                    <Link to="/vendor-settings" className="bg-white border text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-50">Settings</Link>
-                </div>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-white p-4 rounded shadow-sm border-l-4 border-blue-500">
-                    <div className="text-sm text-gray-500 font-medium">Active Subscribers</div>
-                    <div className="text-2xl font-bold mt-1">{stats.activeSubscribers}</div>
-                </div>
-                <div className="bg-white p-4 rounded shadow-sm border-l-4 border-green-500">
-                    <div className="text-sm text-gray-500 font-medium">Today's Deliveries</div>
-                    <div className="text-2xl font-bold mt-1">{stats.todaysDeliveries}</div>
-                </div>
-                <div className="bg-white p-4 rounded shadow-sm border-l-4 border-orange-500">
-                    <div className="text-sm text-gray-500 font-medium">Pending Approvals</div>
-                    <div className="text-2xl font-bold mt-1">{stats.pendingLeaves}</div>
-                </div>
-                <div className="bg-white p-4 rounded shadow-sm border-l-4 border-purple-500">
-                    <div className="text-sm text-gray-500 font-medium">Next Payout</div>
-                    <div className="text-2xl font-bold mt-1">₹{stats.nextPayout}</div>
-                </div>
-            </div>
-
-            {/* Today's Roster */}
-            <div className="bg-white rounded-xl shadow border overflow-hidden">
-                <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                    <h2 className="font-bold text-lg">Today's Delivery Roster ({format(new Date(), 'MMM d')})</h2>
-                    <button className="text-sm bg-white border px-3 py-1 rounded hover:bg-gray-100 font-medium">Print List</button>
+        <div className="bg-brand-base min-h-screen">
+            <div className="max-w-6xl mx-auto py-8 px-4">
+                <div className="flex justify-between items-center mb-6">
+                    <h1 className="text-3xl font-extrabold text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>Chef Dashboard</h1>
+                    <div className="flex gap-4">
+                        <Link to="/vendor-menu" className="btn-skeuo-primary px-4 py-2">Manage Menu</Link>
+                        <Link to="/vendor-plans" className="btn-skeuo px-4 py-2 hover:bg-white/50">Manage Plans</Link>
+                        <Link to="/vendor-settings" className="btn-skeuo px-4 py-2 hover:bg-white/50">Settings</Link>
+                    </div>
                 </div>
 
-                <table className="min-w-full divide-y">
-                    <thead className="bg-white">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Address / PIN</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Meal</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                        {todayOrders.length === 0 ? (
-                            <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">No deliveries scheduled for today!</td></tr>
-                        ) : todayOrders.map(order => {
-                            const address = order.subscription.delivery_notes || 'No Address Provided';
-                            return (
-                                <tr key={order.id} className={order.status === 'DELIVERED' ? 'bg-green-50/30' : ''}>
-                                    <td className="px-6 py-4">
-                                        <div className="font-medium text-gray-900">{order.user.name}</div>
-                                        <div className="text-xs text-gray-500">{order.user.phone}</div>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-sm line-clamp-2" title={address}>{address}</div>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm font-medium">
-                                        {order.meal_type}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <span className={`px-2 py-1 text-[10px] font-bold rounded ${order.status === 'PREPARING' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
-                                            {order.status}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {order.status !== 'DELIVERED' && (
-                                            <button onClick={() => completeOrder(order.id)} className="text-sm text-green-600 border border-green-600 rounded px-3 py-1 hover:bg-green-50 font-medium">
-                                                Mark Delivered
-                                            </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                    <div className="card-neumorphic border-l-4 border-blue-500">
+                        <div className="text-sm text-text-secondary font-medium">Active Subscribers</div>
+                        <div className="text-2xl font-bold mt-1 text-text-primary">{stats.activeSubscribers}</div>
+                    </div>
+                    <div className="card-neumorphic border-l-4 border-success">
+                        <div className="text-sm text-text-secondary font-medium">Today's Deliveries</div>
+                        <div className="text-2xl font-bold mt-1 text-text-primary">{stats.todaysDeliveries}</div>
+                    </div>
+                    <div className="card-neumorphic border-l-4 border-brand-primary">
+                        <div className="text-sm text-text-secondary font-medium">Pending Approvals</div>
+                        <div className="text-2xl font-bold mt-1 text-text-primary">{stats.pendingLeaves}</div>
+                    </div>
+                    <div className="card-neumorphic border-l-4 border-purple-500">
+                        <div className="text-sm text-text-secondary font-medium">Next Payout</div>
+                        <div className="text-2xl font-bold mt-1 text-text-primary">₹{stats.nextPayout}</div>
+                    </div>
+                </div>
+
+                {/* Today's Roster */}
+                <div className="card-neumorphic overflow-hidden p-0 mb-8">
+                    <div className="p-5 border-b border-brand-primary/10 bg-brand-base flex justify-between items-center rounded-t-[20px]">
+                        <h2 className="font-extrabold text-xl text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>Today's Delivery Roster ({format(new Date(), 'MMM d')})</h2>
+                        <button className="btn-skeuo text-sm px-4 py-2 hover:bg-white/50">Print List</button>
+                    </div>
+
+                    <table className="min-w-full divide-y divide-brand-primary/10">
+                        <thead className="bg-brand-primary/5">
+                            <tr>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Customer</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Address / PIN</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Meal</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-4 text-left text-xs font-bold text-text-secondary uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-brand-primary/10 bg-transparent">
+                            {todayOrders.length === 0 ? (
+                                <tr><td colSpan={5} className="px-6 py-8 text-center text-text-secondary font-medium">No deliveries scheduled for today!</td></tr>
+                            ) : todayOrders.map(order => {
+                                const address = order.subscription.delivery_notes || 'No Address Provided';
+                                return (
+                                    <tr key={order.id} className={order.status === 'DELIVERED' ? 'bg-success/5' : 'hover:bg-brand-primary/5 transition-colors'}>
+                                        <td className="px-6 py-4">
+                                            <div className="font-bold text-text-primary">{order.user.name}</div>
+                                            <div className="text-xs text-text-secondary font-medium">{order.user.phone}</div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="text-sm font-medium text-text-secondary line-clamp-2" title={address}>{address}</div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-bold text-text-primary">
+                                            {order.meal_type}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-inner inset-shadow-sm border ${order.status === 'PREPARING' ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/20' : 'bg-success/10 text-success border-success/20'}`}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {order.status !== 'DELIVERED' && (
+                                                <button onClick={() => completeOrder(order.id)} className="btn-skeuo text-sm px-4 py-2 hover:bg-success/10 hover:text-success text-brand-primary border border-transparent">
+                                                    Mark Delivered
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

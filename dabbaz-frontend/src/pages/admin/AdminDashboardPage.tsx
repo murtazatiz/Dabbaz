@@ -23,27 +23,29 @@ export default function AdminDashboardPage() {
     }, []);
 
     return (
-        <div className="p-8">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Platform Overview</h1>
-                <Link to="/admin-queue" className="bg-indigo-600 text-white px-4 py-2 rounded font-medium hover:bg-indigo-700">Vendor Approvals Queue</Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500">
-                    <h3 className="text-gray-500 text-sm font-medium">Total Users</h3>
-                    <p className="text-3xl font-bold mt-2">{stats.totalUsers}</p>
+        <div className="bg-brand-base min-h-screen">
+            <div className="max-w-6xl mx-auto py-8 px-4">
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-extrabold text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>Platform Overview</h1>
+                    <Link to="/admin-queue" className="btn-skeuo-primary px-6 py-2">Vendor Approvals Queue</Link>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
-                    <h3 className="text-gray-500 text-sm font-medium">Active Vendors</h3>
-                    <p className="text-3xl font-bold mt-2">{stats.activeVendors}</p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
-                    <h3 className="text-gray-500 text-sm font-medium">Pending Approvals</h3>
-                    <p className="text-3xl font-bold mt-2">{stats.pendingApplications}</p>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow border-l-4 border-indigo-500">
-                    <h3 className="text-gray-500 text-sm font-medium">Active Subscriptions</h3>
-                    <p className="text-3xl font-bold mt-2">{stats.activeSubscriptions}</p>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="card-neumorphic border-l-4 border-blue-500">
+                        <h3 className="text-text-secondary text-sm font-bold">Total Users</h3>
+                        <p className="text-3xl font-extrabold mt-2 text-text-primary">{stats.totalUsers}</p>
+                    </div>
+                    <div className="card-neumorphic border-l-4 border-success">
+                        <h3 className="text-text-secondary text-sm font-bold">Active Vendors</h3>
+                        <p className="text-3xl font-extrabold mt-2 text-text-primary">{stats.activeVendors}</p>
+                    </div>
+                    <div className="card-neumorphic border-l-4 border-brand-primary">
+                        <h3 className="text-text-secondary text-sm font-bold">Pending Approvals</h3>
+                        <p className="text-3xl font-extrabold mt-2 text-text-primary">{stats.pendingApplications}</p>
+                    </div>
+                    <div className="card-neumorphic border-l-4 border-purple-500">
+                        <h3 className="text-text-secondary text-sm font-bold">Active Subscriptions</h3>
+                        <p className="text-3xl font-extrabold mt-2 text-text-primary">{stats.activeSubscriptions}</p>
+                    </div>
                 </div>
             </div>
         </div>

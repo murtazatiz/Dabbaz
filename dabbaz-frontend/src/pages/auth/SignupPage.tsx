@@ -52,79 +52,79 @@ export default function SignupPage() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
-            <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-xl shadow-sm">
+        <div className="flex min-h-screen items-center justify-center bg-brand-base px-4 py-12 sm:px-6 lg:px-8">
+            <div className="w-full max-w-md space-y-8 card-neumorphic">
                 <div>
-                    <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
+                    <h2 className="mt-6 text-center text-3xl font-extrabold tracking-wide text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>
                         Create an account
                     </h2>
                 </div>
 
-                <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-                    <div className="space-y-4 rounded-md shadow-sm">
+                <form className="mt-8 space-y-7" onSubmit={handleSubmit(onSubmit)}>
+                    <div className="space-y-5 rounded-md">
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="name" className="block text-sm font-bold text-text-secondary mb-2">
                                 Full Name
                             </label>
                             <input
                                 id="name"
                                 type="text"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+                                className="input-neumorphic w-full"
                                 {...register('name')}
                             />
-                            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
+                            {errors.name && <p className="mt-1 text-sm text-error font-medium">{errors.name.message}</p>}
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="email" className="block text-sm font-bold text-text-secondary mb-2">
                                 Email address
                             </label>
                             <input
                                 id="email"
                                 type="email"
                                 autoComplete="email"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+                                className="input-neumorphic w-full"
                                 {...register('email')}
                             />
-                            {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
+                            {errors.email && <p className="mt-1 text-sm text-error font-medium">{errors.email.message}</p>}
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="password" className="block text-sm font-bold text-text-secondary mb-2">
                                 Password
                             </label>
                             <input
                                 id="password"
                                 type="password"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+                                className="input-neumorphic w-full"
                                 {...register('password')}
                             />
-                            {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
+                            {errors.password && <p className="mt-1 text-sm text-error font-medium">{errors.password.message}</p>}
                         </div>
 
                         <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="confirmPassword" className="block text-sm font-bold text-text-secondary mb-2">
                                 Confirm Password
                             </label>
                             <input
                                 id="confirmPassword"
                                 type="password"
                                 autoComplete="new-password"
-                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-green-500 sm:text-sm"
+                                className="input-neumorphic w-full"
                                 {...register('confirmPassword')}
                             />
-                            {errors.confirmPassword && <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>}
+                            {errors.confirmPassword && <p className="mt-1 text-sm text-error font-medium">{errors.confirmPassword.message}</p>}
                         </div>
                     </div>
 
-                    {serverError && <p className="text-sm text-center text-red-600">{serverError}</p>}
+                    {serverError && <p className="text-sm text-center text-error font-medium">{serverError}</p>}
 
                     <div>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex w-full justify-center rounded-md border border-transparent bg-green-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:bg-green-400"
+                            className="btn-skeuo-primary w-full py-3 disabled:opacity-50"
                         >
                             {isSubmitting ? 'Creating account...' : 'Sign up'}
                         </button>
@@ -134,17 +134,17 @@ export default function SignupPage() {
                 <div className="mt-6">
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-300" />
+                            <div className="w-full border-t border-brand-primary/10" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="bg-white px-2 text-gray-500">Or continue with</span>
+                            <span className="bg-brand-base px-2 text-text-secondary font-medium">Or continue with</span>
                         </div>
                     </div>
 
                     <div className="mt-6">
                         <button
                             onClick={handleGoogleSignup}
-                            className="flex w-full items-center justify-center gap-3 rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                            className="btn-skeuo flex w-full items-center justify-center gap-3 py-3"
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M23.7449 12.27C23.7449 11.48 23.6849 10.73 23.5549 10H12.2549V14.51H18.7249C18.4349 15.99 17.5849 17.24 16.3249 18.09V21.09H20.1849C22.4449 19.01 23.7449 15.92 23.7449 12.27Z" fill="#4285F4" />
@@ -157,9 +157,9 @@ export default function SignupPage() {
                     </div>
                 </div>
 
-                <p className="mt-2 text-center text-sm text-gray-600">
+                <p className="mt-2 text-center text-sm text-text-secondary font-medium">
                     Already have an account?{' '}
-                    <Link to="/login" className="font-medium text-green-600 hover:text-green-500">
+                    <Link to="/login" className="font-bold text-brand-primary hover:text-brand-secondary transition-colors">
                         Sign in
                     </Link>
                 </p>

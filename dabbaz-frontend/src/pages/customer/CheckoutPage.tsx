@@ -99,7 +99,7 @@ export default function CheckoutPage() {
             {/* Checkout Form */}
             <div className="flex-1 space-y-8">
                 {invalidVendors.length > 0 && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+                    <div className="bg-error/10 border border-error text-error p-4 rounded-xl shadow-inner inset-shadow-sm">
                         <h3 className="font-bold flex items-center gap-2">
                             <span className="text-xl">⚠️</span> Minimum Order Requirement
                         </h3>
@@ -107,24 +107,24 @@ export default function CheckoutPage() {
                     </div>
                 )}
 
-                <div className="bg-white rounded-xl shadow-sm border p-6">
-                    <h2 className="text-2xl font-bold mb-6">Delivery Details</h2>
+                <div className="card-neumorphic">
+                    <h2 className="text-2xl font-bold mb-6 text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>Delivery Details</h2>
                     <form id="checkout-form" onSubmit={handleCheckout} className="space-y-6">
                         <div>
-                            <h3 className="font-bold text-lg mb-4">Delivery Address</h3>
-                            <div className="space-y-4">
+                            <h3 className="font-bold text-lg mb-4 text-text-primary">Delivery Address</h3>
+                            <div className="space-y-5">
                                 <div>
-                                    <label className="block text-sm font-medium mb-1">Complete Address</label>
-                                    <textarea required value={addressLine} onChange={e => setAddressLine(e.target.value)} rows={3} className="w-full border rounded p-2" placeholder="House/Flat No., Building, Street Area..."></textarea>
+                                    <label className="block text-sm font-bold text-text-primary mb-2">Complete Address</label>
+                                    <textarea required value={addressLine} onChange={e => setAddressLine(e.target.value)} rows={3} className="input-neumorphic w-full resize-none" placeholder="House/Flat No., Building, Street Area..."></textarea>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-2 gap-5">
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">PIN Code</label>
-                                        <input required value={pincode} onChange={e => setPincode(e.target.value)} className="w-full border rounded p-2" placeholder="e.g. 400001" />
+                                        <label className="block text-sm font-bold text-text-primary mb-2">PIN Code</label>
+                                        <input required value={pincode} onChange={e => setPincode(e.target.value)} className="input-neumorphic w-full" placeholder="e.g. 400001" />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Landmark (Optional)</label>
-                                        <input value={landmark} onChange={e => setLandmark(e.target.value)} className="w-full border rounded p-2" placeholder="e.g. Near Post Office" />
+                                        <label className="block text-sm font-bold text-text-primary mb-2">Landmark (Optional)</label>
+                                        <input value={landmark} onChange={e => setLandmark(e.target.value)} className="input-neumorphic w-full" placeholder="e.g. Near Post Office" />
                                     </div>
                                 </div>
                             </div>
@@ -135,56 +135,56 @@ export default function CheckoutPage() {
 
             {/* Order Summary */}
             <div className="w-full md:w-96 shrink-0">
-                <div className="bg-gray-50 rounded-xl border p-6 sticky top-8">
-                    <h3 className="font-bold text-lg mb-4">Order Summary</h3>
+                <div className="card-neumorphic sticky top-8">
+                    <h3 className="font-bold text-xl mb-6 text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>Order Summary</h3>
 
-                    <div className="space-y-4 text-sm mb-6 max-h-64 overflow-y-auto pr-2">
+                    <div className="space-y-4 text-sm mb-6 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                         {items.map(item => (
-                            <div key={item.id} className="flex justify-between items-start border-b pb-2 last:border-0 last:pb-0">
+                            <div key={item.id} className="flex justify-between items-start border-b border-brand-primary/10 pb-3 mb-3 last:border-0 last:pb-0 last:mb-0">
                                 <div>
-                                    <span className="font-medium text-gray-900">{item.menu_item.name}</span>
-                                    <div className="text-xs text-gray-500">{item.vendor.business_name} • {item.meal_type}</div>
-                                    <div className="text-xs text-gray-500 mt-0.5">Qty: {item.quantity} • {item.fulfillment_mode}</div>
+                                    <span className="font-bold text-text-primary">{item.menu_item.name}</span>
+                                    <div className="text-xs font-medium text-text-secondary mt-1">{item.vendor.business_name} • {item.meal_type}</div>
+                                    <div className="text-xs font-medium text-text-secondary mt-0.5">Qty: {item.quantity} • {item.fulfillment_mode}</div>
                                 </div>
-                                <span className="font-medium">₹{100 * item.quantity}</span>
+                                <span className="font-bold text-brand-primary">₹{100 * item.quantity}</span>
                             </div>
                         ))}
                     </div>
 
-                    <div className="space-y-3 text-sm mb-6 py-4 border-y border-gray-200">
-                        <div className="flex justify-between text-gray-600">
+                    <div className="space-y-4 text-sm mb-6 py-4 border-t border-brand-primary/10 mt-2">
+                        <div className="flex justify-between text-text-secondary font-medium">
                             <span>Item Total</span>
-                            <span>₹{itemsTotal}</span>
+                            <span className="text-text-primary font-bold">₹{itemsTotal}</span>
                         </div>
-                        <div className="flex justify-between text-gray-600">
+                        <div className="flex justify-between text-text-secondary font-medium">
                             <span>Delivery Partner Fee</span>
-                            <span>₹{deliveryTotal}</span>
+                            <span className="text-text-primary font-bold">₹{deliveryTotal}</span>
                         </div>
-                        <div className="flex justify-between text-gray-600">
+                        <div className="flex justify-between text-text-secondary font-medium">
                             <span>Platform Fee</span>
-                            <span>₹{platformFee}</span>
+                            <span className="text-text-primary font-bold">₹{platformFee}</span>
                         </div>
-                        <div className="flex justify-between text-gray-600">
+                        <div className="flex justify-between text-text-secondary font-medium">
                             <span>Taxes (GST)</span>
-                            <span>₹{(gstFood + gstDelivery).toFixed(2)}</span>
+                            <span className="text-text-primary font-bold">₹{(gstFood + gstDelivery).toFixed(2)}</span>
                         </div>
                     </div>
 
-                    <div className="flex justify-between font-bold text-xl mb-6">
+                    <div className="flex justify-between font-extrabold text-2xl text-text-primary mb-6 pt-4 border-t border-brand-primary/10">
                         <span>To Pay</span>
-                        <span>₹{finalAmount.toFixed(2)}</span>
+                        <span className="text-brand-primary">₹{finalAmount.toFixed(2)}</span>
                     </div>
 
                     <button
                         form="checkout-form"
                         type="submit"
                         disabled={invalidVendors.length > 0 || isProcessing}
-                        className="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-opacity"
+                        className="btn-skeuo-primary w-full py-4 text-lg disabled:opacity-50"
                     >
                         {isProcessing ? 'Processing...' : `Proceed to Pay (₹${finalAmount.toFixed(2)})`}
                     </button>
 
-                    <p className="text-xs text-gray-500 mt-4 text-center">Secure payment powered by Razorpay.</p>
+                    <p className="text-xs font-medium text-text-secondary mt-4 text-center">Secure payment powered by Razorpay.</p>
                 </div>
             </div>
 

@@ -34,6 +34,8 @@ app.use('/api/vendors', publicVendorRoutes);
 
 // Protected vendor routes
 app.use('/api/vendors', vendorRoutes);
+import vendorAddonRoutes from './routes/vendorAddon.routes';
+app.use('/api/vendors/addons', vendorAddonRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/vendors/menu', menuRoutes);
 app.use('/api/vendors/plans', subscriptionRoutes);

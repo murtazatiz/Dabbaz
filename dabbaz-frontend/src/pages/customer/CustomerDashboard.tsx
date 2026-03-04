@@ -36,75 +36,77 @@ export default function CustomerDashboard() {
     if (loading) return <div>Loading...</div>;
 
     return (
-        <div className="max-w-6xl mx-auto py-8 px-4">
-            <h1 className="text-2xl font-bold mb-6">My Subscriptions</h1>
+        <div className="bg-brand-base min-h-screen">
+            <div className="max-w-6xl mx-auto py-8 px-4">
+                <h1 className="text-3xl font-extrabold mb-8 text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>My Subscriptions</h1>
 
-            {subscriptions.length === 0 ? (
-                <div className="bg-white rounded p-12 text-center text-gray-500 shadow border">
-                    You don't have any active meal subscriptions. Browse local chefs to get started!
-                </div>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {subscriptions.map(sub => (
-                        <div key={sub.id} className="bg-white rounded-xl shadow-sm border p-6">
-                            <div className="flex justify-between items-start mb-4">
-                                <div>
-                                    <h3 className="font-bold text-lg">{sub.plan.name}</h3>
-                                    <p className="text-sm text-gray-600">by {sub.vendor.business_name}</p>
-                                </div>
-                                <span className={`px-2 py-1 text-xs font-bold rounded ${sub.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                                    sub.status === 'PAUSED' ? 'bg-yellow-100 text-yellow-800' :
-                                        'bg-gray-100 text-gray-800'
-                                    }`}>
-                                    {sub.status}
-                                </span>
-                            </div>
-
-                            <div className="space-y-2 text-sm text-gray-600 bg-gray-50 p-4 rounded mb-4">
-                                <div className="flex justify-between">
-                                    <span>Meals Remaining</span>
-                                    <span className="font-medium text-gray-900">{sub.meals_remaining} / {sub.plan.duration_days}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Valid Until</span>
-                                    <span className="font-medium">{format(new Date(sub.end_date), 'MMM d, yyyy')}</span>
-                                </div>
-                                {sub.status === 'PAUSED' && sub.resume_date && (
-                                    <div className="flex justify-between text-yellow-700">
-                                        <span>Resumes On</span>
-                                        <span className="font-medium">{format(new Date(sub.resume_date), 'MMM d, yyyy')}</span>
+                {subscriptions.length === 0 ? (
+                    <div className="card-neumorphic p-12 text-center text-text-secondary font-medium">
+                        You don't have any active meal subscriptions. Browse local chefs to get started!
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {subscriptions.map(sub => (
+                            <div key={sub.id} className="card-neumorphic">
+                                <div className="flex justify-between items-start mb-5">
+                                    <div>
+                                        <h3 className="font-extrabold text-xl text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>{sub.plan.name}</h3>
+                                        <p className="text-sm font-medium text-text-secondary mt-1">by {sub.vendor.business_name}</p>
                                     </div>
-                                )}
-                                {sub.Order && sub.Order.length > 0 && (
-                                    <div className="mt-4 pt-4 border-t border-gray-200">
-                                        <div className="font-semibold text-gray-900 mb-2">Upcoming Deliveries:</div>
-                                        <div className="max-h-32 overflow-y-auto space-y-1 pr-2">
-                                            {sub.Order.map((order: any, idx: number) => (
-                                                <div key={idx} className="flex justify-between text-xs">
-                                                    <span>{format(new Date(order.delivery_date), 'EEE, MMM d')}</span>
-                                                    <span className="font-medium">{order.meal_type}</span>
-                                                    <span className={`px-2 rounded-full ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-700' : 'bg-gray-200'}`}>{order.status}</span>
-                                                </div>
-                                            ))}
+                                    <span className={`px-3 py-1 text-xs font-bold rounded-full shadow-inner inset-shadow-sm border ${sub.status === 'ACTIVE' ? 'bg-success/10 text-success border-success/20' :
+                                        sub.status === 'PAUSED' ? 'bg-brand-primary/10 text-brand-primary border-brand-primary/20' :
+                                            'bg-gray-100 text-gray-800 border-gray-200'
+                                        }`}>
+                                        {sub.status}
+                                    </span>
+                                </div>
+
+                                <div className="space-y-3 text-sm text-text-secondary font-medium bg-brand-primary/5 p-5 rounded-xl mb-6 border border-brand-primary/10">
+                                    <div className="flex justify-between items-center">
+                                        <span>Meals Remaining</span>
+                                        <span className="font-bold text-brand-primary text-base">{sub.meals_remaining} / {sub.plan.duration_days}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center border-t border-brand-primary/10 pt-3">
+                                        <span>Valid Until</span>
+                                        <span className="font-bold text-text-primary">{format(new Date(sub.end_date), 'MMM d, yyyy')}</span>
+                                    </div>
+                                    {sub.status === 'PAUSED' && sub.resume_date && (
+                                        <div className="flex justify-between text-brand-secondary border-t border-brand-primary/10 pt-3">
+                                            <span>Resumes On</span>
+                                            <span className="font-bold">{format(new Date(sub.resume_date), 'MMM d, yyyy')}</span>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
+                                    )}
+                                    {sub.Order && sub.Order.length > 0 && (
+                                        <div className="mt-4 pt-4 border-t border-brand-primary/20">
+                                            <div className="font-extrabold text-text-primary mb-3">Upcoming Deliveries:</div>
+                                            <div className="max-h-32 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                                                {sub.Order.map((order: any, idx: number) => (
+                                                    <div key={idx} className="flex justify-between items-center text-xs p-2 bg-white/50 rounded-lg">
+                                                        <span className="font-medium">{format(new Date(order.delivery_date), 'EEE, MMM d')}</span>
+                                                        <span className="font-bold text-text-primary">{order.meal_type}</span>
+                                                        <span className={`px-2 py-1 rounded-full shadow-inner inset-shadow-sm border ${order.status === 'DELIVERED' ? 'bg-success/10 text-success border-success/20' : 'bg-brand-primary/10 text-brand-primary border-brand-primary/20'}`}>{order.status}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
 
-                            <div className="flex gap-2">
-                                <Link to={`/chef/${sub.vendor.slug}`} className="flex-1 text-center bg-green-50 text-green-700 border border-green-200 py-2 font-medium rounded hover:bg-green-100">
-                                    View Menu
-                                </Link>
-                                {sub.status === 'ACTIVE' && (
-                                    <button onClick={() => handlePause(sub.id)} className="flex-1 bg-white border py-2 font-medium rounded hover:bg-gray-50">
-                                        Pause Deliveries
-                                    </button>
-                                )}
+                                <div className="flex gap-4">
+                                    <Link to={`/chef/${sub.vendor.slug}`} className="btn-skeuo-primary flex-1 text-center py-3 text-sm">
+                                        View Menu
+                                    </Link>
+                                    {sub.status === 'ACTIVE' && (
+                                        <button onClick={() => handlePause(sub.id)} className="btn-skeuo flex-1 py-3 text-sm text-text-secondary hover:text-brand-secondary">
+                                            Pause Deliveries
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

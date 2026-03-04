@@ -69,14 +69,14 @@ export default function CartSheet() {
                                     leaveTo="translate-x-full"
                                 >
                                     <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                        <div className="flex h-full flex-col bg-white shadow-xl">
+                                        <div className="flex h-full flex-col glass-panel">
                                             <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                                                 <div className="flex items-start justify-between">
-                                                    <Dialog.Title className="text-lg font-medium text-gray-900">Your Cart</Dialog.Title>
+                                                    <Dialog.Title className="text-lg font-bold text-text-primary tracking-wide">Your Cart</Dialog.Title>
                                                     <div className="ml-3 flex h-7 items-center">
                                                         <button
                                                             type="button"
-                                                            className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
+                                                            className="relative -m-2 p-2 text-text-secondary hover:text-text-primary transition-colors"
                                                             onClick={() => setOpen(false)}
                                                         >
                                                             <span className="absolute -inset-0.5" />
@@ -89,26 +89,26 @@ export default function CartSheet() {
                                                 <div className="mt-8">
                                                     <div className="flow-root">
                                                         {isLoading ? (
-                                                            <p>Loading...</p>
+                                                            <p className="text-text-secondary">Loading...</p>
                                                         ) : items.length === 0 ? (
-                                                            <p className="text-center text-gray-500">Your cart is empty</p>
+                                                            <p className="text-center text-text-secondary font-medium">Your cart is empty</p>
                                                         ) : (
-                                                            <ul role="list" className="-my-6 divide-y divide-gray-200">
+                                                            <ul role="list" className="-my-6 divide-y divide-brand-primary/20">
                                                                 {groupedItems.map((group) => (
-                                                                    <li key={group.vendorId} className="py-6">
-                                                                        <div className="mb-4 flex items-center justify-between border-b pb-2">
-                                                                            <h3 className="font-semibold text-gray-900">{group.vendor.business_name}</h3>
-                                                                            <div className="flex space-x-2 text-sm">
+                                                                    <li key={group.vendorId} className="py-8">
+                                                                        <div className="mb-6 flex items-center justify-between border-b border-brand-primary/10 pb-4">
+                                                                            <h3 className="font-bold text-lg text-text-primary">{group.vendor.business_name}</h3>
+                                                                            <div className="flex space-x-3 text-sm">
                                                                                 <button
                                                                                     onClick={() => updateFulfillmentMode(group.vendorId, 'DELIVERY')}
-                                                                                    className={`px-3 py-1 rounded-full ${group.fulfillment_mode === 'DELIVERY' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}
+                                                                                    className={`px-4 py-1.5 text-xs font-bold tracking-wide ${group.fulfillment_mode === 'DELIVERY' ? 'btn-skeuo-primary' : 'btn-skeuo'}`}
                                                                                 >
                                                                                     Delivery
                                                                                 </button>
                                                                                 {group.vendor.collection_enabled && (
                                                                                     <button
                                                                                         onClick={() => updateFulfillmentMode(group.vendorId, 'COLLECTION')}
-                                                                                        className={`px-3 py-1 rounded-full ${group.fulfillment_mode === 'COLLECTION' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-700'}`}
+                                                                                        className={`px-4 py-1.5 text-xs font-bold tracking-wide ${group.fulfillment_mode === 'COLLECTION' ? 'btn-skeuo-primary' : 'btn-skeuo'}`}
                                                                                     >
                                                                                         Pickup
                                                                                     </button>
@@ -116,24 +116,24 @@ export default function CartSheet() {
                                                                             </div>
                                                                         </div>
 
-                                                                        <ul role="list" className="space-y-4">
+                                                                        <ul role="list" className="space-y-6">
                                                                             {group.items.map((item) => (
                                                                                 <li key={item.id} className="flex">
                                                                                     <div className="ml-4 flex flex-1 flex-col">
                                                                                         <div>
-                                                                                            <div className="flex justify-between text-base font-medium text-gray-900">
+                                                                                            <div className="flex justify-between text-base font-bold text-text-primary">
                                                                                                 <h4>{item.menu_item.name}</h4>
-                                                                                                <p className="ml-4">₹{100 * item.quantity}</p>
+                                                                                                <p className="ml-4 text-brand-primary">₹{100 * item.quantity}</p>
                                                                                             </div>
-                                                                                            <p className="mt-1 text-sm text-gray-500">{new Date(item.delivery_date).toLocaleDateString()} - {item.meal_type}</p>
+                                                                                            <p className="mt-1 text-sm text-text-secondary font-medium">{new Date(item.delivery_date).toLocaleDateString()} &bull; {item.meal_type}</p>
                                                                                         </div>
-                                                                                        <div className="flex flex-1 items-end justify-between text-sm">
-                                                                                            <p className="text-gray-500">Qty {item.quantity}</p>
+                                                                                        <div className="flex flex-1 items-end justify-between text-sm mt-2">
+                                                                                            <p className="text-text-primary font-bold bg-white/40 px-3 py-1 rounded-lg shadow-sm border border-white/50">Qty {item.quantity}</p>
                                                                                             <div className="flex">
                                                                                                 <button
                                                                                                     type="button"
                                                                                                     onClick={() => removeFromCart(item.id)}
-                                                                                                    className="font-medium text-indigo-600 hover:text-indigo-500"
+                                                                                                    className="font-bold text-error hover:opacity-80 transition-opacity"
                                                                                                 >
                                                                                                     Remove
                                                                                                 </button>
@@ -145,9 +145,9 @@ export default function CartSheet() {
                                                                         </ul>
 
                                                                         {group.fulfillment_mode === 'DELIVERY' && group.vendor.delivery_charge && (
-                                                                            <div className="mt-4 flex justify-between text-sm text-gray-600 border-t pt-2">
+                                                                            <div className="mt-6 flex justify-between text-sm font-bold text-text-secondary border-t border-brand-primary/10 pt-4">
                                                                                 <p>Delivery Charge</p>
-                                                                                <p>₹{group.vendor.delivery_charge}</p>
+                                                                                <p className="text-text-primary">₹{group.vendor.delivery_charge}</p>
                                                                             </div>
                                                                         )}
                                                                     </li>
@@ -159,26 +159,26 @@ export default function CartSheet() {
                                             </div>
 
                                             {items.length > 0 && (
-                                                <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                                                    <div className="flex justify-between text-base font-medium text-gray-900">
+                                                <div className="border-t border-brand-primary/20 px-4 py-6 sm:px-6 bg-white/30 backdrop-blur-md">
+                                                    <div className="flex justify-between text-lg font-extrabold text-text-primary">
                                                         <p>Subtotal</p>
-                                                        <p>₹{orderTotal}</p>
+                                                        <p className="text-brand-primary">₹{orderTotal}</p>
                                                     </div>
-                                                    <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
+                                                    <p className="mt-1 text-sm text-text-secondary font-medium">Shipping and taxes calculated at checkout.</p>
                                                     <div className="mt-6">
                                                         <button
                                                             onClick={handleCheckout}
-                                                            className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                                                            className="btn-skeuo-primary flex w-full items-center justify-center px-6 py-4 text-lg"
                                                         >
                                                             Checkout
                                                         </button>
                                                     </div>
-                                                    <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
+                                                    <div className="mt-6 flex justify-center text-center text-sm text-text-secondary font-medium">
                                                         <p>
                                                             or{' '}
                                                             <button
                                                                 type="button"
-                                                                className="font-medium text-indigo-600 hover:text-indigo-500"
+                                                                className="font-bold text-brand-primary hover:text-brand-secondary transition-colors"
                                                                 onClick={() => setOpen(false)}
                                                             >
                                                                 Continue Shopping

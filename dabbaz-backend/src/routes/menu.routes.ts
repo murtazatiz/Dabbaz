@@ -7,13 +7,18 @@ import {
     updateMenuItem,
     deleteMenuItem,
     toggleOffDay,
-    toggleSlotDisable
+    toggleSlotDisable,
+    toggleStatus,
+    getMenuItemAddons,
+    attachMenuItemAddons,
+    updateMenuItemAddon,
+    detachMenuItemAddon
 } from '../controllers/menu.controller';
 
 const router = Router();
 
-// Used by both vendor and customer contexts (customer only needs GET)
-router.get('/', getMenu);
+// Used by vendor context
+router.get('/', requireAuth, getMenu);
 
 // Admin / Vendor specific mutations
 router.post('/', requireAuth, requireRole('VENDOR'), createMenuItem);
@@ -22,5 +27,12 @@ router.delete('/:id', requireAuth, requireRole('VENDOR'), deleteMenuItem);
 
 router.patch('/:id/off-day', requireAuth, requireRole('VENDOR'), toggleOffDay);
 router.patch('/:id/disable-slot', requireAuth, requireRole('VENDOR'), toggleSlotDisable);
+router.patch('/:id/status', requireAuth, requireRole('VENDOR'), toggleStatus);
+
+// Addons for specific menu item
+router.get('/:id/addons', requireAuth, getMenuItemAddons);
+router.post('/:id/addons', requireAuth, requireRole('VENDOR'), attachMenuItemAddons);
+router.put('/:id/addons/:addonId', requireAuth, requireRole('VENDOR'), updateMenuItemAddon);
+router.delete('/:id/addons/:addonId', requireAuth, requireRole('VENDOR'), detachMenuItemAddon);
 
 export default router;

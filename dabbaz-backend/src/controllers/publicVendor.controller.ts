@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { parseISO, addDays, startOfWeek } from 'date-fns';
+import { parseISO, addDays, startOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
 export const listVendors = async (req: Request, res: Response) => {
     try {
@@ -66,7 +66,7 @@ export const getVendorPublicProfile = async (req: Request, res: Response) => {
 export const getVendorMenu = async (req: Request, res: Response) => {
     try {
         const { slug } = req.params;
-        const { week } = req.query;
+        const { week, month } = req.query;
 
         const slugStr = typeof slug === 'string' ? slug : slug[0];
 
@@ -77,25 +77,40 @@ export const getVendorMenu = async (req: Request, res: Response) => {
         if (!vendor) return res.status(404).json({ message: 'Vendor not found' });
 
         let startDate = new Date();
-        if (week) {
+        let endDate = new Date();
+
+        if (month) {
+            startDate = startOfMonth(parseISO((month as string) + '-01'));
+            endDate = endOfMonth(startDate);
+        } else if (week) {
             startDate = parseISO(week as string);
+            endDate = addDays(startDate, 7);
         } else {
-            startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
+            startDate = startOfMonth(new Date());
+            endDate = endOfMonth(startDate);
         }
-        const endDate = addDays(startDate, 7);
 
         const items = await prisma.menuItem.findMany({
             where: {
                 vendor_id: vendor.id,
+                status: 'PUBLISHED',
                 date: {
                     gte: startDate,
-                    lt: endDate,
+                    lte: endDate,
                 },
             },
+            include: {
+                MenuItemAddon: {
+                    include: {
+                        addon: true
+                    }
+                }
+            }
         });
 
         res.json({ items });
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Internal server error' });
     }
 };

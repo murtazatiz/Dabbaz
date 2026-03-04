@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
-import { startOfWeek, endOfWeek, addDays, parseISO } from 'date-fns';
+import { startOfWeek, endOfWeek, addDays, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 
 export const getMenu = async (req: Request, res: Response) => {
     try {
@@ -8,31 +8,43 @@ export const getMenu = async (req: Request, res: Response) => {
         const vendorProfile = await prisma.vendorProfile.findUnique({ where: { user_id: user.id } });
         if (!vendorProfile) return res.status(404).json({ message: 'Vendor not found' });
 
-        const weekStr = req.query.week as string; // 'YYYY-MM-DD' representing Monday
+        const monthStr = req.query.month as string;
+        const weekStr = req.query.week as string;
         let startDate = new Date();
-        if (weekStr) {
-            startDate = parseISO(weekStr);
-        } else {
-            startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
-        }
+        let endDate = new Date();
 
-        // Add 7 days to get the end of the week
-        const endDate = addDays(startDate, 7);
+        if (monthStr) {
+            startDate = startOfMonth(parseISO(monthStr + '-01'));
+            endDate = endOfMonth(startDate);
+        } else if (weekStr) {
+            startDate = parseISO(weekStr);
+            endDate = addDays(startDate, 7);
+        } else {
+            startDate = startOfMonth(new Date());
+            endDate = endOfMonth(startDate);
+        }
 
         const items = await prisma.menuItem.findMany({
             where: {
                 vendor_id: vendorProfile.id,
                 date: {
                     gte: startDate,
-                    lt: endDate,
+                    lte: endDate,
                 },
             },
+            include: {
+                MenuItemAddon: {
+                    include: {
+                        addon: true
+                    }
+                }
+            }
         });
 
         res.json({ items });
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
     }
 };
 
@@ -62,9 +74,9 @@ export const createMenuItem = async (req: Request, res: Response) => {
         });
 
         res.json({ item });
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
     }
 };
 
@@ -89,8 +101,9 @@ export const updateMenuItem = async (req: Request, res: Response) => {
         });
 
         res.json({ item });
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
     }
 };
 
@@ -99,8 +112,9 @@ export const deleteMenuItem = async (req: Request, res: Response) => {
         const { id } = req.params;
         await prisma.menuItem.delete({ where: { id: Number(id) } });
         res.json({ message: 'Deleted' });
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
     }
 };
 
@@ -117,8 +131,9 @@ export const toggleOffDay = async (req: Request, res: Response) => {
         });
 
         res.json({ message: 'Day off toggled' });
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
     }
 };
 
@@ -134,7 +149,115 @@ export const toggleSlotDisable = async (req: Request, res: Response) => {
         });
 
         res.json({ message: 'Slot toggled' });
-    } catch (error) {
-        res.status(500).json({ message: 'Internal server error' });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
+    }
+};
+
+export const toggleStatus = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const item = await prisma.menuItem.findUnique({ where: { id: Number(id) } });
+        if (!item) return res.status(404).json({ message: "Not found" });
+
+        const newStatus = item.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+
+        const updated = await prisma.menuItem.update({
+            where: { id: Number(id) },
+            data: { status: newStatus }
+        });
+
+        res.json({ item: updated });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
+    }
+};
+
+export const getMenuItemAddons = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const addons = await prisma.menuItemAddon.findMany({
+            where: { menu_item_id: Number(id) },
+            include: { addon: true }
+        });
+        res.json({ addons });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
+    }
+};
+
+export const attachMenuItemAddons = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { addons } = req.body; // array of { addonId, price }
+
+        await prisma.menuItemAddon.deleteMany({
+            where: { menu_item_id: Number(id) }
+        });
+
+        if (addons && addons.length > 0) {
+            await prisma.menuItemAddon.createMany({
+                data: addons.map((a: any) => ({
+                    menu_item_id: Number(id),
+                    addon_id: Number(a.addonId),
+                    price: Number(a.price)
+                }))
+            });
+        }
+
+        const updatedAddons = await prisma.menuItemAddon.findMany({
+            where: { menu_item_id: Number(id) },
+            include: { addon: true }
+        });
+
+        res.json({ addons: updatedAddons });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
+    }
+};
+
+export const updateMenuItemAddon = async (req: Request, res: Response) => {
+    try {
+        const { id, addonId } = req.params;
+        const { price } = req.body;
+
+        const updated = await prisma.menuItemAddon.update({
+            where: {
+                menu_item_id_addon_id: {
+                    menu_item_id: Number(id),
+                    addon_id: Number(addonId)
+                }
+            },
+            data: { price: Number(price) }
+        });
+
+        res.json({ addon: updated });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
+    }
+};
+
+export const detachMenuItemAddon = async (req: Request, res: Response) => {
+    try {
+        const { id, addonId } = req.params;
+
+        await prisma.menuItemAddon.delete({
+            where: {
+                menu_item_id_addon_id: {
+                    menu_item_id: Number(id),
+                    addon_id: Number(addonId)
+                }
+            }
+        });
+
+        res.json({ message: 'Detached' });
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message, stack: error.stack });
     }
 };

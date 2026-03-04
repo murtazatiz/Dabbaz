@@ -100,95 +100,102 @@ export default function PlansPage() {
     };
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Subscription Plans</h1>
-                <button onClick={() => openModal()} className="bg-green-600 text-white px-4 py-2 rounded font-medium hover:bg-green-700">
-                    Create New Plan
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {plans.map(plan => (
-                    <div key={plan.id} className="bg-white p-6 rounded-lg shadow-sm border space-y-4">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <h3 className="font-bold text-lg">{plan.name}</h3>
-                                <p className="text-sm text-gray-500">{plan.duration_days} Days · {plan.meal_type} · {plan.food_type}</p>
-                            </div>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${plan.is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                                {plan.is_active ? 'Active' : 'Paused'}
-                            </span>
-                        </div>
-                        <div className="text-xl font-bold">₹{plan.price}</div>
-                        <div className="flex gap-2 pt-4 border-t">
-                            <button onClick={() => openModal(plan)} className="flex-1 border rounded py-1 text-sm font-medium hover:bg-gray-50">Edit</button>
-                            <button onClick={() => handleToggle(plan.id)} className="flex-1 border rounded py-1 text-sm font-medium hover:bg-gray-50">
-                                {plan.is_active ? 'Pause' : 'Activate'}
-                            </button>
-                            <button onClick={() => handleDelete(plan.id)} className="flex-1 border border-red-200 text-red-600 rounded py-1 text-sm font-medium hover:bg-red-50">Delete</button>
-                        </div>
-                    </div>
-                ))}
-                {plans.length === 0 && <p className="text-gray-500">No plans created yet.</p>}
-            </div>
-
-            {showModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-md">
-                        <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Plan' : 'Create Plan'}</h2>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium">Plan Name</label>
-                                <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Weekly Dabba" className="mt-1 w-full border rounded p-2" />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium">Duration (Days)</label>
-                                    <input type="number" min="4" value={duration} onChange={e => setDuration(Number(e.target.value))} className="mt-1 w-full border rounded p-2" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium">Price (INR)</label>
-                                    <input type="number" value={price} onChange={e => setPrice(e.target.value)} className="mt-1 w-full border rounded p-2" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium">Meal Type</label>
-                                    <select value={mealType} onChange={e => setMealType(e.target.value)} className="mt-1 w-full border rounded p-2">
-                                        <option value="LUNCH">Lunch Only</option>
-                                        <option value="DINNER">Dinner Only</option>
-                                        <option value="BOTH">Lunch + Dinner</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium">Food Type</label>
-                                    <select value={foodType} onChange={e => setFoodType(e.target.value)} className="mt-1 w-full border rounded p-2">
-                                        <option value="VEG">Vegetarian</option>
-                                        <option value="NONVEG">Non-Vegetarian</option>
-                                        <option value="BOTH">Mix</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 mt-4">
-                                <input type="checkbox" id="autoRenew" checked={autoRenewal} onChange={e => setAutoRenewal(e.target.checked)} />
-                                <label htmlFor="autoRenew" className="text-sm">Enable auto-renewal by default</label>
-                            </div>
-
-                            <div className="flex gap-2 pt-4">
-                                <button onClick={() => setShowModal(false)} className="flex-1 border rounded p-2 hover:bg-gray-50">Cancel</button>
-                                <button onClick={handleSave} className="flex-1 bg-green-600 text-white rounded p-2 hover:bg-green-700">Save Plan</button>
-                            </div>
-
-                        </div>
-                    </div>
+        <div className="bg-brand-base min-h-screen">
+            <div className="max-w-4xl mx-auto py-8 px-4">
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-3xl font-extrabold text-text-primary" style={{ fontFamily: "'Playfair Display', serif" }}>Subscription Plans</h1>
+                    <button onClick={() => openModal()} className="btn-skeuo-primary px-6 py-2">
+                        Create New Plan
+                    </button>
                 </div>
-            )}
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {plans.map(plan => (
+                        <div key={plan.id} className="card-neumorphic space-y-4">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="font-extrabold text-xl text-text-primary">{plan.name}</h3>
+                                    <p className="text-sm font-bold text-text-secondary mt-1">{plan.duration_days} Days · {plan.meal_type} · {plan.food_type}</p>
+                                </div>
+                                <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-inner inset-shadow-sm border ${plan.is_active ? 'bg-success/10 text-success border-success/20' : 'bg-brand-primary/10 text-brand-primary border-brand-primary/20'}`}>
+                                    {plan.is_active ? 'Active' : 'Paused'}
+                                </span>
+                            </div>
+                            <div className="text-2xl font-extrabold text-brand-secondary">₹{plan.price}</div>
+                            <div className="flex gap-3 pt-4 border-t border-brand-primary/10">
+                                <button onClick={() => openModal(plan)} className="flex-1 btn-skeuo py-2 text-sm">Edit</button>
+                                <button onClick={() => handleToggle(plan.id)} className="flex-1 btn-skeuo py-2 text-sm">
+                                    {plan.is_active ? 'Pause' : 'Activate'}
+                                </button>
+                                <button onClick={() => handleDelete(plan.id)} className="flex-1 btn-skeuo py-2 text-sm border-error text-error hover:bg-error/10">Delete</button>
+                            </div>
+                        </div>
+                    ))}
+                    {plans.length === 0 && <p className="text-text-secondary font-medium col-span-2 text-center py-8">No plans created yet.</p>}
+                </div>
+
+                {showModal && (
+                    <div className="fixed inset-0 bg-text-primary/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                        <div className="card-glass w-full max-w-md max-h-[90vh] overflow-y-auto">
+                            <h2 className="text-2xl font-extrabold mb-6 text-text-primary border-b border-white/20 pb-3" style={{ fontFamily: "'Playfair Display', serif" }}>{editingId ? 'Edit Plan' : 'Create Plan'}</h2>
+
+                            <div className="space-y-5">
+                                <div>
+                                    <label className="block text-sm font-bold text-text-secondary mb-2">Plan Name</label>
+                                    <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Weekly Dabba" className="input-neumorphic w-full bg-white/50" />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-secondary mb-2">Duration (Days)</label>
+                                        <input type="number" min="4" value={duration} onChange={e => setDuration(Number(e.target.value))} className="input-neumorphic w-full bg-white/50" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-secondary mb-2">Price (INR)</label>
+                                        <input type="number" value={price} onChange={e => setPrice(e.target.value)} className="input-neumorphic w-full bg-white/50" />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-secondary mb-2">Meal Type</label>
+                                        <select value={mealType} onChange={e => setMealType(e.target.value)} className="input-neumorphic w-full bg-white/50">
+                                            <option value="LUNCH">Lunch Only</option>
+                                            <option value="DINNER">Dinner Only</option>
+                                            <option value="BOTH">Lunch + Dinner</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-text-secondary mb-2">Food Type</label>
+                                        <select value={foodType} onChange={e => setFoodType(e.target.value)} className="input-neumorphic w-full bg-white/50">
+                                            <option value="VEG">Vegetarian</option>
+                                            <option value="NONVEG">Non-Vegetarian</option>
+                                            <option value="BOTH">Mix</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-3 mt-2 p-3 bg-brand-primary/5 rounded-xl border border-brand-primary/10">
+                                    <input
+                                        type="checkbox"
+                                        id="autoRenew"
+                                        checked={autoRenewal}
+                                        onChange={e => setAutoRenewal(e.target.checked)}
+                                        className="w-5 h-5 skeuo-radio text-brand-primary"
+                                    />
+                                    <label htmlFor="autoRenew" className="text-sm font-bold text-text-primary cursor-pointer">Enable auto-renewal by default</label>
+                                </div>
+
+                                <div className="flex gap-3 pt-6 border-t border-white/20 mt-6">
+                                    <button onClick={() => setShowModal(false)} className="flex-1 btn-skeuo py-2">Cancel</button>
+                                    <button onClick={handleSave} className="flex-1 btn-skeuo-primary py-2">Save Plan</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

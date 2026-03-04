@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&family=Yeseva+One&display=swap');
 @import "tailwindcss";
 
 @theme {
+    /* Retain original colors just in case some are hardcoded in unchanged places */
     --color-green-50: #edf7f2;
     --color-green-100: #d1ecdd;
     --color-green-200: #a4ecd0;
@@ -22,17 +23,58 @@
     --color-background: #F8FAF9;
     --color-surface: #FFFFFF;
 
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-heading: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    /* New Brand Colors */
+    --color-brand-base: #F0EDE8;
+    --color-brand-primary: #E8792A;
+    --color-brand-secondary: #C0522A;
+    --color-text-primary: #2C1A0E;
+    --color-text-secondary: #7A6055;
+    --color-success: #4A7C59;
+    --color-error: #B94040;
+
+    /* Typography */
+    --font-sans: 'Dongle', ui-sans-serif, system-ui, sans-serif;
+    --font-heading: 'Yeseva One', ui-serif, Georgia, serif;
+    --font-mono: 'DM Mono', ui-monospace, SFMono-Regular, monospace;
+
+    /* Up-scaled text sizes specifically for the highly condensed Dongle font */
+    --text-xs: 1.25rem;
+    --text-sm: 1.5rem;
+    --text-base: 1.75rem;
+    --text-lg: 2rem;
+    --text-xl: 2.25rem;
+    --text-2xl: 2.5rem;
+    --text-3xl: 2.75rem;
+    --text-4xl: 3rem;
+
+    /* Shadow definitions */
+    /* Skeuomorphic resting - Raised */
+    --shadow-skeuo: 4px 4px 10px rgba(180, 130, 90, 0.25), -4px -4px 10px rgba(255, 255, 255, 0.85);
+    /* Skeuomorphic hover - More elevated */
+    --shadow-skeuo-hover: 6px 6px 14px rgba(180, 130, 90, 0.3), -6px -6px 14px rgba(255, 255, 255, 0.9);
+    /* Skeuomorphic pressed - Inverted/Sunken */
+    --shadow-skeuo-pressed: inset 4px 4px 8px rgba(180, 130, 90, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+
+    /* Neumorphic surface (Cards) */
+    --shadow-neumorphic: 6px 6px 14px rgba(180, 130, 90, 0.3), -6px -6px 14px rgba(255, 248, 240, 0.9);
+    /* Neumorphic sunken (Inputs) */
+    --shadow-neumorphic-inset: inset 4px 4px 10px rgba(180, 130, 90, 0.2), inset -4px -4px 10px rgba(255, 248, 240, 0.9);
+
+    /* Glassmorphic elements float shadows */
+    --shadow-glass-float: 0 4px 24px rgba(180, 130, 90, 0.12);
+    --shadow-glass-modal: 0 24px 64px rgba(100, 60, 20, 0.18), 0 2px 8px rgba(255, 255, 255, 0.4);
+    --shadow-glass-toolbar: 0 8px 32px rgba(140, 90, 40, 0.15);
 }
 
 @layer base {
     body {
-        background-color: var(--color-background);
-        color: #111827;
+        background-color: var(--color-brand-base);
+        color: var(--color-text-primary);
         font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        font-size: 1.75rem;
+        line-height: 1.1;
     }
 
     h1,
@@ -42,29 +84,192 @@
     h5,
     h6 {
         font-family: var(--font-heading);
-        font-weight: 600;
-        letter-spacing: -0.025em;
+        font-weight: 400;
+        letter-spacing: normal;
+        line-height: 1.2;
+    }
+
+    h1 {
+        letter-spacing: 0.02em;
+    }
+
+    p {
+        line-height: 1.6;
     }
 }
 
+/* Base custom classes for the layers */
 @layer components {
 
-    /* Base button enhancements when they have bg-green-600 */
-    button[class*="bg-green-600"] {
-        @apply transition-all duration-200 ease-in-out hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95;
+    /* Layer 1: Skeuomorphism (Interactive Controls) */
+    .btn-skeuo {
+        @apply transition-all duration-150 ease-out rounded-lg border border-transparent font-medium;
+        background-color: var(--color-brand-base);
+        box-shadow: 4px 4px 10px rgba(180, 130, 90, 0.25), -4px -4px 10px rgba(255, 255, 255, 0.85);
+        border-top: 1px solid rgba(255, 255, 255, 0.6);
+        border-left: 1px solid rgba(255, 255, 255, 0.6);
+        border-bottom: 1px solid rgba(180, 130, 90, 0.1);
+        border-right: 1px solid rgba(180, 130, 90, 0.1);
+        color: var(--color-text-primary);
     }
 
-    button[class*="bg-white"] {
-        @apply transition-all duration-200 ease-in-out hover:shadow-md hover:bg-gray-50 active:scale-95;
+    .btn-skeuo:hover {
+        box-shadow: 6px 6px 14px rgba(180, 130, 90, 0.3), -6px -6px 14px rgba(255, 255, 255, 0.9);
+        transform: translateY(-1px);
     }
 
-    a[class*="bg-green-600"] {
-        @apply transition-all duration-200 ease-in-out inline-block hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-95;
+    .btn-skeuo:active {
+        box-shadow: inset 4px 4px 8px rgba(180, 130, 90, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+        transform: translateY(1px);
+        border-top: 1px solid transparent;
+        border-left: 1px solid transparent;
     }
 
-    /* Sleek cards styling */
-    .card,
-    div[class*="shadow-md"]:not([class*="fixed"]) {
-        @apply rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-md;
+    .btn-skeuo-primary {
+        @apply transition-all duration-150 ease-out rounded-lg border font-medium;
+        background: linear-gradient(135deg, #F08E4A, #E8792A);
+        box-shadow: 4px 4px 10px rgba(180, 130, 90, 0.25), -4px -4px 10px rgba(255, 255, 255, 0.85);
+        color: white;
+        border-top: 1px solid rgba(255, 255, 255, 0.4);
+        border-left: 1px solid rgba(255, 255, 255, 0.4);
+        border-bottom: 1px solid rgba(180, 130, 90, 0.1);
+        border-right: 1px solid rgba(180, 130, 90, 0.1);
+    }
+
+    .btn-skeuo-primary:hover {
+        box-shadow: 6px 6px 14px rgba(180, 130, 90, 0.3), -6px -6px 14px rgba(255, 255, 255, 0.9);
+        transform: translateY(-1px);
+        background: linear-gradient(135deg, #F29A5A, #E8792A);
+    }
+
+    .btn-skeuo-primary:active {
+        box-shadow: inset 4px 4px 8px rgba(180, 130, 90, 0.3), inset -4px -4px 8px rgba(255, 255, 255, 0.8);
+        transform: translateY(1px);
+        border-top: 1px solid transparent;
+        border-left: 1px solid transparent;
+    }
+
+    /* Checkboxes & Radios */
+    .skeuo-checkbox {
+        @apply appearance-none w-5 h-5 rounded flex items-center justify-center outline-none transition-all duration-150 shrink-0 cursor-pointer;
+        background-color: var(--color-brand-base);
+        box-shadow: inset 3px 3px 6px rgba(180, 130, 90, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+    }
+
+    .skeuo-checkbox:checked {
+        background-color: var(--color-brand-primary);
+        box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+        /* adding a checkmark via pseudo element or background image */
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 7L4.5 10.5L12 1.5' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' style='filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.3));'/%3E%3C/svg%3E");
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: 70%;
+    }
+
+    .skeuo-radio {
+        @apply appearance-none w-5 h-5 flex items-center justify-center outline-none transition-all duration-150 shrink-0 cursor-pointer rounded-full;
+        background-color: var(--color-brand-base);
+        box-shadow: inset 3px 3px 6px rgba(180, 130, 90, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+        background-image: none;
+    }
+
+    .skeuo-radio:checked {
+        /* inner dot */
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 10' fill='%23E8792A' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='5' cy='5' r='3.5' style='filter: drop-shadow(0px 1px 1px rgba(0,0,0,0.4));'/%3E%3C/svg%3E");
+    }
+
+    /* Custom Toggle */
+    .skeuo-toggle-track {
+        @apply relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out;
+        background-color: var(--color-brand-base);
+        box-shadow: inset 3px 3px 6px rgba(180, 130, 90, 0.25), inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+    }
+
+    .skeuo-toggle-track[data-checked="true"] {
+        background: linear-gradient(180deg, #E8792A, #F08E4A);
+    }
+
+    .skeuo-toggle-thumb {
+        @apply pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 ease-in-out;
+        background: var(--color-brand-base);
+        box-shadow: 2px 2px 4px rgba(180, 130, 90, 0.3), -2px -2px 4px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Layer 2: Neumorphism (Cards, Containers, Inputs) */
+    .card-neumorphic {
+        @apply rounded-[20px] transition-all duration-[250ms] ease-in-out p-6;
+        background-color: var(--color-brand-base);
+        box-shadow: 6px 6px 14px rgba(180, 130, 90, 0.3), -6px -6px 14px rgba(255, 248, 240, 0.9);
+        border: none;
+    }
+
+    .card-neumorphic:hover {
+        /* Slight lift */
+        box-shadow: 8px 8px 18px rgba(180, 130, 90, 0.25), -8px -8px 18px rgba(255, 248, 240, 0.95);
+        transform: translateY(-2px);
+    }
+
+    .input-neumorphic {
+        @apply w-full px-4 py-3 rounded-xl outline-none transition-all duration-150 bg-transparent;
+        box-shadow: inset 4px 4px 10px rgba(180, 130, 90, 0.2), inset -4px -4px 10px rgba(255, 248, 240, 0.9);
+        border: none;
+        color: var(--color-text-primary);
+    }
+
+    .input-neumorphic::placeholder {
+        color: var(--color-text-secondary);
+        font-style: italic;
+    }
+
+    .input-neumorphic:focus {
+        box-shadow: inset 4px 4px 10px rgba(180, 130, 90, 0.2), inset -4px -4px 10px rgba(255, 248, 240, 0.9), inset 0 0 0 2px rgba(232, 121, 42, 0.4);
+    }
+
+    /* Layer 3: Glassmorphism (Floating Elements) */
+    .glass-header {
+        background: rgba(240, 237, 232, 0.65);
+        backdrop-filter: blur(18px) saturate(160%);
+        -webkit-backdrop-filter: blur(18px) saturate(160%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+        border-top: 1px solid rgba(255, 255, 255, 0.8);
+        box-shadow: 0 4px 24px rgba(180, 130, 90, 0.12);
+    }
+
+    .glass-modal {
+        background: rgba(245, 241, 236, 0.75);
+        backdrop-filter: blur(24px) saturate(150%);
+        -webkit-backdrop-filter: blur(24px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        border-radius: 28px;
+        box-shadow: 0 24px 64px rgba(100, 60, 20, 0.18), inset 0 2px 8px rgba(255, 255, 255, 0.4);
+    }
+
+    .glass-panel {
+        background: rgba(242, 238, 233, 0.72);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-left: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: inset 2px 0 0 rgba(255, 255, 255, 0.4);
+    }
+
+    .glass-toast {
+        background: rgba(240, 237, 232, 0.70);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 8px 32px rgba(140, 90, 40, 0.15);
+    }
+
+    /* Media query adjust for mobile glass blur */
+    @media (max-width: 768px) {
+
+        .glass-header,
+        .glass-modal,
+        .glass-panel,
+        .glass-toast {
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+        }
     }
 }

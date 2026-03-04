@@ -78,7 +78,7 @@ model VendorProfile {
 
   SubscriptionPlan SubscriptionPlan[]
   MenuItem         MenuItem[]
-  Addon            Addon[]
+  VendorAddon      VendorAddon[]
   Subscription     Subscription[]
   Order            Order[]
   Dispute          Dispute[]
@@ -139,7 +139,7 @@ model MenuItem {
   photo_url        String?
   is_off_day       Boolean       @default(false)
   is_slot_disabled Boolean       @default(false)
-  is_published     Boolean       @default(false)
+  status           String        @default("DRAFT") // "PUBLISHED", "DRAFT"
   fulfilment_types String        @default("DELIVERY") // "DELIVERY", "COLLECTION", "BOTH"
   max_orders       Int?
   max_portions     Int?
@@ -154,14 +154,11 @@ model MenuItem {
   @@unique([vendor_id, date, meal_type])
 }
 
-model Addon {
+model VendorAddon {
   id         Int           @id @default(autoincrement())
   vendor_id  Int
   vendor     VendorProfile @relation(fields: [vendor_id], references: [id])
   name       String
-  price      Decimal
-  food_type  String // "VEG", "NONVEG"
-  is_active  Boolean       @default(true)
   created_at DateTime      @default(now())
 
   MenuItemAddon MenuItemAddon[]
@@ -173,7 +170,8 @@ model MenuItemAddon {
   menu_item_id Int
   menu_item    MenuItem @relation(fields: [menu_item_id], references: [id])
   addon_id     Int
-  addon        Addon    @relation(fields: [addon_id], references: [id])
+  addon        VendorAddon @relation(fields: [addon_id], references: [id])
+  price        Decimal
 
   @@unique([menu_item_id, addon_id])
 }
@@ -227,7 +225,7 @@ model OrderAddon {
   order_id Int
   order    Order @relation(fields: [order_id], references: [id])
   addon_id Int
-  addon    Addon @relation(fields: [addon_id], references: [id])
+  addon    VendorAddon @relation(fields: [addon_id], references: [id])
   quantity Int
 }
 
