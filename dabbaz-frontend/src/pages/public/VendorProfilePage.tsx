@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { format, addMonths, subMonths } from 'date-fns';
+import { Heart } from 'lucide-react';
 import api from '../../lib/api';
+import { useAuth } from '../../store/auth.store';
 import { useCart } from '../../store/cart.store';
 import MenuCalendar from '../../components/calendar/MenuCalendar';
 import DayModal from '../../components/calendar/DayModal';
@@ -17,7 +19,40 @@ export default function VendorProfilePage() {
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
     const { addToCart } = useCart();
+    const { user } = useAuth();
     const [addingItem, setAddingItem] = useState<number | null>(null);
+    const [isFavourited, setIsFavourited] = useState(false);
+
+    useEffect(() => {
+        if (user?.role === 'CUSTOMER' && vendor) {
+            api.get('/customer/favourites')
+                .then(res => {
+                    const favs = res.data.favourites;
+                    setIsFavourited(favs.some((f: any) => f.vendorId === vendor.id));
+                })
+                .catch(console.error);
+        }
+    }, [user, vendor]);
+
+    const toggleFavourite = async () => {
+        if (!user) {
+            alert("Please login to favourite kitchens.");
+            return;
+        }
+        const previousState = isFavourited;
+        setIsFavourited(!isFavourited);
+
+        try {
+            if (previousState) {
+                await api.delete(`/customer/favourites/${vendor.id}`);
+            } else {
+                await api.post(`/customer/favourites/${vendor.id}`);
+            }
+        } catch (error) {
+            console.error("Failed to toggle favourite", error);
+            setIsFavourited(previousState);
+        }
+    };
 
     useEffect(() => {
         const fetchVendorDetails = async () => {
@@ -88,6 +123,16 @@ export default function VendorProfilePage() {
                         <img src={vendor.cover_photo_url} alt="Cover" className="w-full h-full object-cover" />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+
+                    <button
+                        onClick={toggleFavourite}
+                        className="absolute top-6 right-6 md:right-12 p-3 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full transition-all shadow-md active:scale-95"
+                        aria-label="Toggle favourite"
+                    >
+                        <Heart
+                            className={`w-6 h-6 transition-colors duration-300 ${isFavourited ? 'fill-red-500 text-red-500' : 'text-white'}`}
+                        />
+                    </button>
                     <div className="absolute bottom-6 left-6 md:left-12 text-white">
                         <h1 className="text-3xl md:text-5xl font-extrabold flex items-center gap-2 tracking-wide" style={{ fontFamily: "'Playfair Display', serif" }}>
                             {vendor.business_name}

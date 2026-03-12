@@ -36,6 +36,7 @@ model User {
   RefreshToken            RefreshToken[]
   CartItem                CartItem[]
   Invoice                 Invoice[]
+  CustomerFavouriteVendor CustomerFavouriteVendor[]
 }
 
 model VendorProfile {
@@ -85,6 +86,7 @@ model VendorProfile {
   VendorPayout     VendorPayout[]
   Review           Review[]
   CartItem         CartItem[]
+  CustomerFavouriteVendor CustomerFavouriteVendor[]
 }
 
 model VendorOnboardingRequest {
@@ -208,7 +210,7 @@ model Order {
   vendor           VendorProfile @relation(fields: [vendor_id], references: [id])
   delivery_date    DateTime
   meal_type        String // "LUNCH", "DINNER"
-  status           String // "PREPARING", "OUT_FOR_DELIVERY", "DELIVERED", "NOT_DELIVERED", "READY_FOR_COLLECTION", "COLLECTED", "NOT_COLLECTED"
+  status           String // "CONFIRMED", "BEING_PREPARED", "OUT_FOR_DELIVERY", "DELIVERED", "READY_FOR_COLLECTION", "COLLECTED", "CANCELLED"
   is_trial         Boolean       @default(false)
   quantity         Int           @default(1)
   fulfillment_mode String        @default("DELIVERY")
@@ -385,4 +387,15 @@ model PlatformSettings {
   order_freeze_hour    Int      @default(21)
   whatsapp_enabled     Boolean  @default(true)
   updated_at           DateTime @updatedAt
+}
+
+model CustomerFavouriteVendor {
+  id          Int           @id @default(autoincrement())
+  customerId  Int
+  customer    User          @relation(fields: [customerId], references: [id])
+  vendorId    Int
+  vendor      VendorProfile @relation(fields: [vendorId], references: [id])
+  createdAt   DateTime      @default(now())
+
+  @@unique([customerId, vendorId])
 }

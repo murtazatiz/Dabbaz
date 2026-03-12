@@ -26,6 +26,7 @@ import publicVendorRoutes from './routes/publicVendor.routes';
 import checkoutRoutes from './routes/checkout.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import cartRoutes from './routes/cart.routes';
+import customerRoutes from './routes/customer.routes';
 
 app.use('/api/auth', authRoutes);
 
@@ -45,6 +46,7 @@ app.use('/api/subscriptions', checkoutRoutes);
 
 // Dashboards (Customer / Vendor)
 app.use('/api', dashboardRoutes);
+app.use('/api/customer', customerRoutes);
 
 // Cart
 app.use('/api/cart', cartRoutes);
